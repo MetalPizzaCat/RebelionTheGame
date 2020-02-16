@@ -7,7 +7,7 @@ Originaly it was "Prop Hunt" remake in Unreal Engine 4, but as time went it turn
 # Want to contribute?
 This project needs
 * Artist(Person responsible for creating of models and/or animating
-* Map Designer
+* Map Designer<br/>
 **note**: List is not complete
 
 # Links
