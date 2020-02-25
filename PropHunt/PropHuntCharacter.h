@@ -78,6 +78,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
 		float MaxSprintTime = 10.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+		float TimeInAir = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+		float MinTimeInAirToDealDamage = 15.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+		float FallDamageMultiplier = 5.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+		bool bFallDamage = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+		FTimerHandle FallingInfoUpdateTimer;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
 		FTimerHandle SprintUpdateTimer;
 
@@ -136,6 +151,17 @@ public:
 		bool CanSprint();
 
 	bool CanSprint_Implementation();
+
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateAirInfo();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool Die();
+
+	bool Die_Implementation() { return false;/*this base class can not die(for now) and as such always reutyrns false*/ }
+
+	virtual void Landed(const FHitResult& Hit)override;
 
 protected:
 	

@@ -66,6 +66,8 @@ void APropHuntCharacter::BeginPlay()
 
 	GetWorld()->GetTimerManager().SetTimer(SprintUpdateTimer,this,&APropHuntCharacter::SprintUpdate, 0.01f, true);
 
+	GetWorld()->GetTimerManager().SetTimer(FallingInfoUpdateTimer, this, &APropHuntCharacter::UpdateAirInfo, 0.01f, true);
+
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	//FP_Gun->AttachToComponent(PlayerMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 }
@@ -168,6 +170,30 @@ void APropHuntCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 bool APropHuntCharacter::CanSprint_Implementation()
 {
 	return (bAllowedToSprint && !bIsCrouched && CurrentSprintingTime <= (MaxSprintTime - MaxSprintTime * 0.2));
+}
+
+void APropHuntCharacter::UpdateAirInfo()
+{
+	float dt = 0.01f;
+	if (GetCharacterMovement()->IsFalling())
+	{
+		TimeInAir += dt;
+	}
+	else 
+	{
+		TimeInAir = 0.f;
+	}
+}
+
+void APropHuntCharacter::Landed(const FHitResult& Hit)
+{
+	if (TimeInAir >= MinTimeInAirToDealDamage)
+	{
+		Health -= TimeInAir* FallDamageMultiplier;
+		TimeInAir = 0.f;
+		if (Health <= 0) { Die(); }
+	}
+	//else{ingore falling}
 }
 
 void APropHuntCharacter::OnFire()
