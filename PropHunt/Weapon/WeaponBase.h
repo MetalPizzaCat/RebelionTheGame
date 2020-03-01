@@ -141,6 +141,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 		float AIDamageModifier = 0.5f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
+		TSubclassOf<UCameraShake> CameraShakeClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Animation)
 		EWeaponAnimationType AnimType = EWeaponAnimationType::EAT_Rifle;
 

@@ -190,9 +190,31 @@ void APropHuntCharacter::Landed(const FHitResult& Hit)
 	if (TimeInAir >= MinTimeInAirToDealDamage)
 	{
 		Health -= TimeInAir* FallDamageMultiplier;
+
+		if (CameraShakeLandingWeakClass != nullptr && (TimeInAir * FallDamageMultiplier) < 35.f)
+		{
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(CameraShakeLandingWeakClass, 1.0f);
+		}
+		else if (CameraShakeLandingClass != nullptr && (TimeInAir * FallDamageMultiplier) > 35.f)
+		{
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(CameraShakeLandingClass, 1.0f);
+		}
+		if (FallingDamageSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), FallingDamageSound, GetActorLocation());
+		}
+		
 		TimeInAir = 0.f;
 		if (Health <= 0) { Die(); }
 	}
+	else if (TimeInAir >= 0.8f)
+	{
+		if (CameraShakeLandingWeakClass != nullptr )
+		{
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(CameraShakeLandingWeakClass, 1.0f);
+		}
+	}
+	
 	//else{ingore falling}
 }
 
