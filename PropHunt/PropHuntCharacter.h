@@ -93,6 +93,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
 		FTimerHandle FallingInfoUpdateTimer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+		USoundBase* FallingDamageSound;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
 		FTimerHandle SprintUpdateTimer;
 
@@ -141,6 +144,12 @@ public:
 	/** Whether to use motion controller location for aiming. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
+		TSubclassOf<UCameraShake> CameraShakeLandingClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
+		TSubclassOf<UCameraShake> CameraShakeLandingWeakClass;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void UpdateMeshPositionOnCrouch(bool isCrouching);
