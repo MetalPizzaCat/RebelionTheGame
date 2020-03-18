@@ -66,6 +66,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bAllowedToSprint = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=PickingUp)
+		bool bAllowedToPickUp = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Sprinting)
 		bool bIsSprinting = false;
 
