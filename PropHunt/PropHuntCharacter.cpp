@@ -189,13 +189,20 @@ void APropHuntCharacter::Landed(const FHitResult& Hit)
 {
 	if (TimeInAir >= MinTimeInAirToDealDamage)
 	{
-		Health -= TimeInAir* FallDamageMultiplier;
+		float FallDamageModifier = 1.f;
 
-		if (CameraShakeLandingWeakClass != nullptr && (TimeInAir * FallDamageMultiplier) < 35.f)
+		if (TimeInAir <= MinTimeInAirToDealDamage * 1.5f) { FallDamageModifier = 0.3f; }
+		else if(TimeInAir <= MinTimeInAirToDealDamage * 2.f) { FallDamageModifier = 0.5f; }
+		
+		float Damage = TimeInAir * FallDamageMultiplier* FallDamageModifier;
+		
+		Health -= Damage;
+
+		if (CameraShakeLandingWeakClass != nullptr && Damage < 35.f)
 		{
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(CameraShakeLandingWeakClass, 1.0f);
 		}
-		else if (CameraShakeLandingClass != nullptr && (TimeInAir * FallDamageMultiplier) > 35.f)
+		else if (CameraShakeLandingClass != nullptr && Damage > 35.f)
 		{
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(CameraShakeLandingClass, 1.0f);
 		}

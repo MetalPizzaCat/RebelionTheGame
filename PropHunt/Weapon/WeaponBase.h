@@ -26,7 +26,8 @@ enum class EWeaponAnimationType : uint8
 	EAT_Rifle 	UMETA(DisplayName = "RifleAnimation"),
 	EAT_RifleFast 	UMETA(DisplayName = "FastRifleAnimation"),
 	EAT_Shotgun 	UMETA(DisplayName = "ShotgunAnimation"),
-	EAT_Pistol 	UMETA(DisplayName = "PistolAnimation")
+	EAT_Pistol 	UMETA(DisplayName = "PistolAnimation"),
+	EAT_Melee 	UMETA(DisplayName = "MeleeAnimation")
 };
 
 UENUM(BlueprintType)		//Shooting style
@@ -141,6 +142,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 		float AIDamageModifier = 0.5f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+		bool bHolstered = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
 		TSubclassOf<UCameraShake> CameraShakeClass;
 
@@ -166,6 +170,12 @@ public:
 		bool CanShoot();
 
 	virtual bool CanShoot_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+		void Holster();
+
+	UFUNCTION(BlueprintCallable)
+		void UnHolster();
 
 	UFUNCTION(reliable,server,WithValidation)
 		void ServerPrimaryFire(FVector location, FRotator rotation);

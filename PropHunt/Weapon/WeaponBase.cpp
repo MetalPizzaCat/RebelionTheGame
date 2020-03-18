@@ -156,7 +156,17 @@ void AWeaponBase::EndCooldown_Implementation()
 
 bool AWeaponBase::CanShoot_Implementation()
 {
-	return AmmoInTheClip > 0 && bCanShoot;
+	return AmmoInTheClip > 0 && bCanShoot && !bHolstered;
+}
+
+void AWeaponBase::Holster()
+{
+	bHolstered = true; 
+}
+
+void AWeaponBase::UnHolster()
+{
+	bHolstered = false;
 }
 
 void AWeaponBase::SecondaryFireEffects_Implementation(FVector location, FRotator rotation)
