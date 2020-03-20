@@ -38,6 +38,10 @@ protected:
 
 	void SprintUpdate();
 
+	void OnSprintButtonDown() { if (!bSprintKeyDown && !bIsSprinting) { bSprintKeyDown = true; StartSprinting(); } }
+
+	void OnSprintButtonUp() { if (bSprintKeyDown) { bSprintKeyDown = false; StopSprinting(); } }
+
 public:
 
 	UPROPERTY(BlueprintAssignable)
@@ -74,6 +78,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
 		float SprintingSpeed = 900.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
+		bool bSprintKeyDown = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DefaultMovementSpeed = 600.f;
