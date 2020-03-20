@@ -78,7 +78,7 @@ void APropHuntCharacter::OnConstruction(const FTransform& Transform)
 
 void APropHuntCharacter::StartSprinting()
 {
-	if (CanSprint())
+	if (CanSprint()&&!bIsSprinting)
 	{
 		bIsSprinting = true;
 		GetCharacterMovement()->MaxWalkSpeed = SprintingSpeed;
@@ -112,11 +112,20 @@ void APropHuntCharacter::SprintUpdate()
 {
 	if (bIsSprinting)
 	{
-		CurrentSprintingTime += 0.01f;
-		if (CurrentSprintingTime >= MaxSprintTime)
+		if (GetCharacterMovement()->Velocity.Size()==0) { StopSprinting(); }
+		else 
 		{
-			StopSprinting();
+			CurrentSprintingTime += 0.01f;
+			if (CurrentSprintingTime >= MaxSprintTime)
+			{
+				StopSprinting();
+			}
+
 		}
+	}
+	else if (bSprintKeyDown && GetCharacterMovement()->Velocity.Size() != 0)
+	{
+		StartSprinting();
 	}
 	else if (CurrentSprintingTime > 0)
 	{
@@ -126,6 +135,7 @@ void APropHuntCharacter::SprintUpdate()
 			CurrentSprintingTime = 0;
 		}
 	}
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -145,8 +155,8 @@ void APropHuntCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 
 	if (bAllowedToSprint)
 	{
-		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &APropHuntCharacter::StartSprinting);
-		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &APropHuntCharacter::StopSprinting);
+		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &APropHuntCharacter::OnSprintButtonDown);
+		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &APropHuntCharacter::OnSprintButtonUp);
 	}
 
 	// Bind fire event
