@@ -19,6 +19,12 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
         TArray<UQuestRequirementBase*>Requirementes;
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+        FName InfoName;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+        FName InfoDescription;
+
     FName Name;
 
     bool bCompleted = true;

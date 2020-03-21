@@ -3,6 +3,7 @@
 
 #include "QuestSystemComponent.h"
 #include "QuestRequirementTalkTo.h"
+#include "Engine.h"
 
 // Sets default values for this component's properties
 UQuestSystemComponent::UQuestSystemComponent()
@@ -39,11 +40,14 @@ bool UQuestSystemComponent::CompleteAction(FName actionName)
 	{
 		if (CurrentQuest->Requirementes.Num() > 0)
 		{
+			
 			for (int i = 0; i < CurrentQuest->Requirementes.Num(); i++)
 			{
-				if(CurrentQuest->Requirementes[i]->Name==actionName)
+				
+				if (CurrentQuest->Requirementes[i]->Name == actionName&& !CurrentQuest->Requirementes[i]->bFulfilled)
 				{
 					CurrentQuest->Requirementes[i]->bFulfilled = true;
+					
 					return true;
 				}
 			}
@@ -109,12 +113,15 @@ bool UQuestSystemComponent::FinishQuest_Implementation()
 		{
 			for (int i = 0; i < CurrentQuest->Requirementes.Num(); i++)
 			{
-				if (CurrentQuest->Requirementes[i] == nullptr || CurrentQuest->Requirementes[i]->IsValidLowLevel()) {}
-				else if (!CurrentQuest->Requirementes[i]->GetIsFulfilled() && !CurrentQuest->Requirementes[i]->bOptional) 
+				if (CurrentQuest->Requirementes[i] == nullptr || CurrentQuest->Requirementes[i]->IsValidLowLevel())
 				{
-					return false;
+					if (!CurrentQuest->Requirementes[i]->GetIsFulfilled() && !CurrentQuest->Requirementes[i]->bOptional)
+					{
+						return false;
+					}
 				}
 			}
+			
 			CurrentQuest->FinishQuest();
 			CompletedQuestes.Add(CurrentQuest);
 			CurrentQuest = nullptr;
