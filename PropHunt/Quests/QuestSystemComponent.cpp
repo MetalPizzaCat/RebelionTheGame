@@ -60,7 +60,9 @@ bool UQuestSystemComponent::CompleteTalkToSomeone(AActor* someone)
 		{
 			for (int i = 0; i < CurrentQuest->Requirementes.Num(); i++)
 			{
-				if (Cast< UQuestRequirementTalkTo>(CurrentQuest->Requirementes[i])->Someone == someone)
+				auto Req = Cast< UQuestRequirementTalkTo>(CurrentQuest->Requirementes[i]);
+				if(Req !=nullptr&& Req->IsValidLowLevel())
+				if (Req->Someone == someone)
 				{
 					CurrentQuest->Requirementes[i]->bFulfilled = true;
 					return true;
@@ -107,7 +109,8 @@ bool UQuestSystemComponent::FinishQuest_Implementation()
 		{
 			for (int i = 0; i < CurrentQuest->Requirementes.Num(); i++)
 			{
-				if (!CurrentQuest->Requirementes[i]->GetIsFulfilled() && !CurrentQuest->Requirementes[i]->bOptional) 
+				if (CurrentQuest->Requirementes[i] == nullptr || CurrentQuest->Requirementes[i]->IsValidLowLevel()) {}
+				else if (!CurrentQuest->Requirementes[i]->GetIsFulfilled() && !CurrentQuest->Requirementes[i]->bOptional) 
 				{
 					return false;
 				}
