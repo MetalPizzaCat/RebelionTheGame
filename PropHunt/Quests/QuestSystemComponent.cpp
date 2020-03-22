@@ -43,12 +43,14 @@ bool UQuestSystemComponent::CompleteAction(FName actionName)
 			
 			for (int i = 0; i < CurrentQuest->Requirementes.Num(); i++)
 			{
-				
-				if (CurrentQuest->Requirementes[i]->Name == actionName&& !CurrentQuest->Requirementes[i]->bFulfilled)
+				if (CurrentQuest->Requirementes[i] != nullptr)
 				{
-					CurrentQuest->Requirementes[i]->bFulfilled = true;
-					
-					return true;
+					if (CurrentQuest->Requirementes[i]->Name == actionName && !CurrentQuest->Requirementes[i]->bFulfilled)
+					{
+						CurrentQuest->Requirementes[i]->bFulfilled = true;
+
+						return true;
+					}
 				}
 			}
 		}
@@ -113,7 +115,7 @@ bool UQuestSystemComponent::FinishQuest_Implementation()
 		{
 			for (int i = 0; i < CurrentQuest->Requirementes.Num(); i++)
 			{
-				if (CurrentQuest->Requirementes[i] == nullptr || CurrentQuest->Requirementes[i]->IsValidLowLevel())
+				if (CurrentQuest->Requirementes[i] != nullptr || CurrentQuest->Requirementes[i]->IsValidLowLevel())
 				{
 					if (!CurrentQuest->Requirementes[i]->GetIsFulfilled() && !CurrentQuest->Requirementes[i]->bOptional)
 					{
