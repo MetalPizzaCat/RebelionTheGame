@@ -5,6 +5,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ManagmentInterface.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/InputComponent.h"
 
 // Sets default values
@@ -47,7 +48,60 @@ void AManagementPlayer::Interact_Implementation()
 					IManagmentInterface::Execute_Interact(hit.GetActor(), this, hit.GetComponent());
 				}
 			}
+			if (bBuilding)
+			{
+				FinishBuilding();
+			}
 		}
+	}
+}
+
+void AManagementPlayer::FinishBuilding()
+{
+	if (bBuilding)
+	{
+		bBuilding = false;
+		CurrentBuilding = nullptr;
+	}
+}
+
+void AManagementPlayer::CancelBuilding()
+{
+	if (bBuilding)
+	{
+		bBuilding = false;
+
+		CurrentBuilding->Destroy();
+	}
+
+}
+
+void AManagementPlayer::StartBuilding_Implementation(TSubclassOf<ABaseBuildingBase>BuildingClass)
+{
+	if (GetWorld() != nullptr) 
+	{
+		FActorSpawnParameters params = FActorSpawnParameters();
+		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		if (PController != nullptr)
+		{
+			FHitResult hit;
+			if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, hit))
+			{
+				CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), hit.Location, FRotator::ZeroRotator, params);
+				
+			}
+			else
+			{
+				CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), FVector::ZeroVector, FRotator::ZeroRotator, params);
+			}
+		}
+		else
+		{
+			CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), FVector::ZeroVector, FRotator::ZeroRotator, params);
+		}
+		
+		bBuilding = true;
 	}
 }
 
@@ -63,6 +117,10 @@ void AManagementPlayer::Tick(float DeltaTime)
 		if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, hit))
 		{
 			MouseDecal->SetWorldLocationAndRotation(hit.Location, UKismetMathLibrary::MakeRotationFromAxes(hit.ImpactNormal, FVector::ZeroVector, FVector::ZeroVector));
+			if (bBuilding && CurrentBuilding != nullptr) 
+			{
+				CurrentBuilding->SetActorLocation(hit.Location);
+			}
 		}
 	}
 
@@ -74,6 +132,8 @@ void AManagementPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("ManagmentInteract", EInputEvent::IE_Pressed, this, &AManagementPlayer::Interact);
+
+	PlayerInputComponent->BindAction("ManagmentRightMouseInteract", EInputEvent::IE_Pressed, this, &AManagementPlayer::CancelBuilding);
 
 }
 

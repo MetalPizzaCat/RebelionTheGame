@@ -3,66 +3,32 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
-#include "Camera/CameraComponent.h"
-#include "PropHunt/Weapon/WeaponBase.h"
+#include "GameFramework/Actor.h"
+#include "Components/BillboardComponent.h"
 #include "BaseBuildingBase.h"
-#include "Components/DecalComponent.h"
-#include "ManagementPlayer.generated.h"
+#include "BaseInfo.generated.h"
 
 UCLASS()
-class PROPHUNT_API AManagementPlayer : public APawn
+class PROPHUNT_API ABaseInfo : public AActor
 {
 	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	ABaseInfo();
 
-public:
-	// Sets default values for this pawn's properties
-	AManagementPlayer();
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+		UBillboardComponent* Billboard;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TArray<ABaseBuildingBase*>Buildings;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	APlayerController* PController = nullptr;
 public:	
-
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-		UCameraComponent* Camera;
-
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-		UDecalComponent* MouseDecal;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TMap<EAmmoType, int> TotalAmmoInBase;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Building)
-		bool bBuilding = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Building)
-		ABaseBuildingBase* CurrentBuilding = nullptr;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void Interact();
-
-	void Interact_Implementation();
-
-	UFUNCTION(BlueprintCallable)
-		void FinishBuilding();
-
-
-	UFUNCTION(BlueprintCallable)
-		void CancelBuilding();
-
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void StartBuilding(TSubclassOf<ABaseBuildingBase>BuildingClass);
-
-	void StartBuilding_Implementation(TSubclassOf<ABaseBuildingBase>BuildingClass);
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
