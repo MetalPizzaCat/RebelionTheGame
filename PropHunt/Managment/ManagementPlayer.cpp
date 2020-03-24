@@ -5,6 +5,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ManagmentInterface.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine.h"
 #include "Components/InputComponent.h"
 
 // Sets default values
@@ -24,6 +26,8 @@ void AManagementPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SetupUI();
+
 	if (GetController() != nullptr)
 	{
 		if (Cast<APlayerController>(GetController()) != nullptr)
@@ -47,8 +51,162 @@ void AManagementPlayer::Interact_Implementation()
 					IManagmentInterface::Execute_Interact(hit.GetActor(), this, hit.GetComponent());
 				}
 			}
+			if (bBuilding)
+			{
+				FinishBuilding();
+			}
 		}
 	}
+}
+
+void AManagementPlayer::FinishBuilding()
+{
+	if (bBuilding)
+	{
+		if (CurrentBuilding->CanBeBuilt())
+		{
+			bBuilding = false;
+			CurrentBuilding->OnBuildFinished();
+			CurrentBuilding->bBuilt = true;
+			if (Info != nullptr)
+			{
+				Info->Buildings.Add(CurrentBuilding);
+			}
+			CurrentBuilding = nullptr;
+
+			PController->SetInputMode(FInputModeGameAndUI());
+			PController->bShowMouseCursor = true;
+
+		
+			OnFinishedBuilding.Broadcast();
+		}
+	}
+}
+
+void AManagementPlayer::CancelBuilding()
+{
+	if (bBuilding)
+	{
+		bBuilding = false;
+
+		CurrentBuilding->Destroy();
+		CurrentBuilding = nullptr;
+
+		
+		PController->SetInputMode(FInputModeGameAndUI());
+		PController->bShowMouseCursor = true;
+	}
+	else
+	{
+		StartDestroyingBuildings();
+	}
+
+}
+
+void AManagementPlayer::RotateBuilding()
+{
+	if (bBuilding && CurrentBuilding != nullptr)
+	{
+		CurrentBuilding->AddActorLocalRotation(FRotator(0.f, 30.f, 0.f));
+	}
+}
+
+void AManagementPlayer::StartDestroyingBuildings()
+{
+	
+	if (!bBuilding)
+	{
+		
+		if (PController != nullptr)
+		{
+			
+			FHitResult hit;
+			if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery7, true, hit))
+			{
+				if (hit.GetActor() != nullptr)
+				{
+					
+					auto building = Cast<ABaseBuildingBase>(hit.GetActor());
+					if (building != nullptr)
+					{
+						
+						FinishDestroyingBuildings(building);
+					}
+					else
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, hit.GetActor()->GetClass()->GetDisplayNameText().ToString());
+					}
+				}
+
+			}
+		}
+	}
+}
+
+void AManagementPlayer::FinishDestroyingBuildings(ABaseBuildingBase* building)
+{
+	if (building != nullptr)
+	{
+		if (Info->Buildings.Num() > 0) 
+		{
+			int id = -1;
+			for (int i = 0; i < Info->Buildings.Num(); i++)
+			{
+				if (Info->Buildings[i] == building)
+				{
+					id = i;
+					break;
+				}
+			}
+			if (id != -1)
+			{
+				Info->Buildings[id]->Destroy();
+				Info->Buildings.RemoveAt(id);
+			}
+		}
+	}
+}
+
+void AManagementPlayer::StartBuilding_Implementation(TSubclassOf<ABaseBuildingBase>BuildingClass)
+{
+	if (CurrentBuilding == nullptr)
+	{
+		if (GetWorld() != nullptr)
+		{
+			FActorSpawnParameters params = FActorSpawnParameters();
+			params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			if (PController != nullptr)
+			{
+				FHitResult hit;
+				if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, hit))
+				{
+					CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), hit.Location, FRotator::ZeroRotator, params);
+
+				}
+				else
+				{
+					CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), FVector::ZeroVector, FRotator::ZeroRotator, params);
+				}
+			}
+			else
+			{
+				CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), FVector::ZeroVector, FRotator::ZeroRotator, params);
+			}
+
+			CurrentBuilding->OnBuildStarted();
+
+			PController->SetInputMode(FInputModeGameOnly());
+			PController->bShowMouseCursor = false;
+			bBuilding = true;
+		}
+	}
+}
+
+bool AManagementPlayer::CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase> BuildingClass)
+{
+	if (!bBuilding) { return true; }
+	return false;
 }
 
 // Called every frame
@@ -60,9 +218,13 @@ void AManagementPlayer::Tick(float DeltaTime)
 	if (PController != nullptr)
 	{
 		FHitResult hit;
-		if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, hit))
+		if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery7, true, hit))
 		{
 			MouseDecal->SetWorldLocationAndRotation(hit.Location, UKismetMathLibrary::MakeRotationFromAxes(hit.ImpactNormal, FVector::ZeroVector, FVector::ZeroVector));
+			if (bBuilding && CurrentBuilding != nullptr) 
+			{
+				CurrentBuilding->SetActorLocation(hit.Location);
+			}
 		}
 	}
 
@@ -74,6 +236,13 @@ void AManagementPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("ManagmentInteract", EInputEvent::IE_Pressed, this, &AManagementPlayer::Interact);
+
+	PlayerInputComponent->BindAction("ManagmentRightMouseInteract", EInputEvent::IE_Pressed, this, &AManagementPlayer::CancelBuilding);
+
+	PlayerInputComponent->BindAction("ManagmentRotateObject", EInputEvent::IE_Pressed, this, &AManagementPlayer::RotateBuilding);
+
+	PlayerInputComponent->BindAction("ManagmentDestroy", EInputEvent::IE_Pressed, this, &AManagementPlayer::StartDestroyingBuildings);
+	
 
 }
 

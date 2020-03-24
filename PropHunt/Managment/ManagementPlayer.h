@@ -5,8 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Camera/CameraComponent.h"
+#include "PropHunt/Weapon/WeaponBase.h"
+#include "BaseBuildingBase.h"
 #include "Components/DecalComponent.h"
+#include "BaseInfo.h"
 #include "ManagementPlayer.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishedBuilding);
 
 UCLASS()
 class PROPHUNT_API AManagementPlayer : public APawn
@@ -24,16 +29,64 @@ protected:
 	APlayerController* PController = nullptr;
 public:	
 
+	UPROPERTY(BlueprintAssignable)
+		FOnFinishedBuilding OnFinishedBuilding;
+
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 		UCameraComponent* Camera;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 		UDecalComponent* MouseDecal;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TMap<EAmmoType, int> TotalAmmoInBase;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Building)
+		bool bBuilding = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Building)
+		ABaseBuildingBase* CurrentBuilding = nullptr;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void Interact();
 
 	void Interact_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+		void FinishBuilding();
+
+
+	UFUNCTION(BlueprintCallable)
+		void CancelBuilding();
+
+	UFUNCTION(BlueprintCallable)
+		void RotateBuilding();
+
+	UFUNCTION(BlueprintCallable)
+		void StartDestroyingBuildings();
+
+	UFUNCTION(BlueprintCallable)
+		void FinishDestroyingBuildings(ABaseBuildingBase*building);
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		ABaseInfo* Info;
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void StartBuilding(TSubclassOf<ABaseBuildingBase>BuildingClass);
+
+	void StartBuilding_Implementation(TSubclassOf<ABaseBuildingBase>BuildingClass);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool CanBeBuilt(TSubclassOf<ABaseBuildingBase>BuildingClass);
+
+	bool CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase>BuildingClass);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetupUI();
+
+	void  SetupUI_Implementation() {}
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
