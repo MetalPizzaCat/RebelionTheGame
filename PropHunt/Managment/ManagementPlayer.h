@@ -11,6 +11,8 @@
 #include "BaseInfo.h"
 #include "ManagementPlayer.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishedBuilding);
+
 UCLASS()
 class PROPHUNT_API AManagementPlayer : public APawn
 {
@@ -26,6 +28,9 @@ protected:
 
 	APlayerController* PController = nullptr;
 public:	
+
+	UPROPERTY(BlueprintAssignable)
+		FOnFinishedBuilding OnFinishedBuilding;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 		UCameraComponent* Camera;
@@ -56,6 +61,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void RotateBuilding();
+
+	UFUNCTION(BlueprintCallable)
+		void StartDestroyingBuildings();
+
+	UFUNCTION(BlueprintCallable)
+		void FinishDestroyingBuildings(ABaseBuildingBase*building);
 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
