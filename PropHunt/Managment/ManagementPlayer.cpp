@@ -25,6 +25,8 @@ void AManagementPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SetupUI();
+
 	if (GetController() != nullptr)
 	{
 		if (Cast<APlayerController>(GetController()) != nullptr)
@@ -60,8 +62,20 @@ void AManagementPlayer::FinishBuilding()
 {
 	if (bBuilding)
 	{
-		bBuilding = false;
-		CurrentBuilding = nullptr;
+		if (CurrentBuilding->CanBeBuilt())
+		{
+			bBuilding = false;
+			CurrentBuilding->OnBuildFinished();
+			CurrentBuilding->bBuilt = true;
+			if (Info != nullptr)
+			{
+				Info->Buildings.Add(CurrentBuilding);
+			}
+			CurrentBuilding = nullptr;
+
+			PController->SetInputMode(FInputModeUIOnly());
+			PController->bShowMouseCursor = true;
+		}
 	}
 }
 
@@ -72,37 +86,63 @@ void AManagementPlayer::CancelBuilding()
 		bBuilding = false;
 
 		CurrentBuilding->Destroy();
+		CurrentBuilding = nullptr;
+
+		
+		PController->SetInputMode(FInputModeUIOnly());
+		PController->bShowMouseCursor = true;
 	}
 
 }
 
+void AManagementPlayer::RotateBuilding()
+{
+	if (bBuilding && CurrentBuilding != nullptr)
+	{
+		CurrentBuilding->AddActorLocalRotation(FRotator(0.f, 30.f, 0.f));
+	}
+}
+
 void AManagementPlayer::StartBuilding_Implementation(TSubclassOf<ABaseBuildingBase>BuildingClass)
 {
-	if (GetWorld() != nullptr) 
+	if (CurrentBuilding == nullptr)
 	{
-		FActorSpawnParameters params = FActorSpawnParameters();
-		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		if (PController != nullptr)
+		if (GetWorld() != nullptr)
 		{
-			FHitResult hit;
-			if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, hit))
+			FActorSpawnParameters params = FActorSpawnParameters();
+			params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			if (PController != nullptr)
 			{
-				CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), hit.Location, FRotator::ZeroRotator, params);
-				
+				FHitResult hit;
+				if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, hit))
+				{
+					CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), hit.Location, FRotator::ZeroRotator, params);
+
+				}
+				else
+				{
+					CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), FVector::ZeroVector, FRotator::ZeroRotator, params);
+				}
 			}
 			else
 			{
 				CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), FVector::ZeroVector, FRotator::ZeroRotator, params);
 			}
+
+			CurrentBuilding->OnBuildStarted();
+
+			PController->SetInputMode(FInputModeGameOnly());
+			PController->bShowMouseCursor = false;
+			bBuilding = true;
 		}
-		else
-		{
-			CurrentBuilding = GetWorld()->SpawnActor<ABaseBuildingBase>(BuildingClass.Get(), FVector::ZeroVector, FRotator::ZeroRotator, params);
-		}
-		
-		bBuilding = true;
 	}
+}
+
+bool AManagementPlayer::CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase> BuildingClass)
+{
+	if (!bBuilding) { return true; }
+	return false;
 }
 
 // Called every frame
@@ -134,6 +174,8 @@ void AManagementPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("ManagmentInteract", EInputEvent::IE_Pressed, this, &AManagementPlayer::Interact);
 
 	PlayerInputComponent->BindAction("ManagmentRightMouseInteract", EInputEvent::IE_Pressed, this, &AManagementPlayer::CancelBuilding);
+
+	PlayerInputComponent->BindAction("ManagmentRotateObject", EInputEvent::IE_Pressed, this, &AManagementPlayer::RotateBuilding);
 
 }
 

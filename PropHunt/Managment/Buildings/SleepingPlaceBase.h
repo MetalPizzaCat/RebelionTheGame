@@ -4,41 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "BaseBuildingBase.generated.h"
+#include "PropHunt/Managment/BaseBuildingBase.h"
+#include "SleepingPlaceBase.generated.h"
 
 UCLASS()
-class PROPHUNT_API ABaseBuildingBase : public AActor
+class PROPHUNT_API ASleepingPlaceBase : public ABaseBuildingBase
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ABaseBuildingBase();
+	ASleepingPlaceBase();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		int SleepingPlaces = 1;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		bool bBuilt = false;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnBuildFinished();
-
-	void OnBuildFinished_Implementation() {}
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnBuildStarted();
-
-	void OnBuildStarted_Implementation() {}
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		bool CanBeBuilt();
-	
-
-	bool CanBeBuilt_Implementation() { return false; }
 };

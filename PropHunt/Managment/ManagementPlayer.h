@@ -8,6 +8,7 @@
 #include "PropHunt/Weapon/WeaponBase.h"
 #include "BaseBuildingBase.h"
 #include "Components/DecalComponent.h"
+#include "BaseInfo.h"
 #include "ManagementPlayer.generated.h"
 
 UCLASS()
@@ -53,11 +54,28 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void CancelBuilding();
 
+	UFUNCTION(BlueprintCallable)
+		void RotateBuilding();
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		ABaseInfo* Info;
+
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void StartBuilding(TSubclassOf<ABaseBuildingBase>BuildingClass);
 
 	void StartBuilding_Implementation(TSubclassOf<ABaseBuildingBase>BuildingClass);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool CanBeBuilt(TSubclassOf<ABaseBuildingBase>BuildingClass);
+
+	bool CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase>BuildingClass);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetupUI();
+
+	void  SetupUI_Implementation() {}
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
