@@ -20,5 +20,11 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FText Description;
+	
 
+	FBuidingItemInfo() {}
+
+	FBuidingItemInfo(FString _Name, int _Amount, FText _Description) :Name(_Name), Amount(_Amount), Description(_Description) {}
+
+	FBuidingItemInfo(FString _Name, int _Amount) :Name(_Name), Amount(_Amount){}
 };

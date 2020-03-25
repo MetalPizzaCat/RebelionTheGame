@@ -66,6 +66,12 @@ public:
 		void StartDestroyingBuildings();
 
 	UFUNCTION(BlueprintCallable)
+		void RemoveItemsFromInventory(TArray<FBuidingItemInfo>items);
+
+	UFUNCTION(BlueprintCallable)
+		void AddItemToInventory(FBuidingItemInfo item);
+
+	UFUNCTION(BlueprintCallable)
 		void FinishDestroyingBuildings(ABaseBuildingBase*building);
 
 
