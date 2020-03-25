@@ -3,38 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Components/BillboardComponent.h"
-#include "BaseBuildingBase.h"
-#include "PropHunt/Managment/ItemInfo.h"
-#include "BaseInfo.generated.h"
+#include "Engine/UserDefinedStruct.h"
+#include "Engine/DataTable.h"
+#include "ItemInfo.generated.h"
 
-
-
-UCLASS()
-class PROPHUNT_API ABaseInfo : public AActor
+USTRUCT(BlueprintType)
+struct FBuidingItemInfo : public FTableRowBase
 {
 	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FString Name;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		int Amount = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FText Description;
 	
-public:	
-	// Sets default values for this actor's properties
-	ABaseInfo();
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-		UBillboardComponent* Billboard;
+	FBuidingItemInfo() {}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<ABaseBuildingBase*> Buildings;
+	FBuidingItemInfo(FString _Name, int _Amount, FText _Description) :Name(_Name), Amount(_Amount), Description(_Description) {}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<FBuidingItemInfo> StoredItems;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	FBuidingItemInfo(FString _Name, int _Amount) :Name(_Name), Amount(_Amount){}
 };

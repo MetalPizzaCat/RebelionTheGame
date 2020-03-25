@@ -68,6 +68,26 @@ void AManagementPlayer::FinishBuilding()
 			bBuilding = false;
 			CurrentBuilding->OnBuildFinished();
 			CurrentBuilding->bBuilt = true;
+
+			//deduct how much items will be removed from storage
+
+			TArray<FString>Keys;
+			TArray<FBuidingItemInfo>ItemsToRemove;
+			CurrentBuilding->NeededItems.GetKeys(Keys);
+			if (Keys.Num() > 0)
+			{
+				for (int i = 0; i < Keys.Num(); i++) 
+				{
+					if (CurrentBuilding->NeededItems.Find(Keys[i]) != nullptr)
+					{
+						ItemsToRemove.Add(FBuidingItemInfo(Keys[i], *CurrentBuilding->NeededItems.Find(Keys[i])));
+					}
+				}
+
+				RemoveItemsFromInventory(ItemsToRemove);
+			}
+
+
 			if (Info != nullptr)
 			{
 				Info->Buildings.Add(CurrentBuilding);
@@ -115,31 +135,60 @@ void AManagementPlayer::StartDestroyingBuildings()
 {
 	
 	if (!bBuilding)
-	{
-		
+	{		
 		if (PController != nullptr)
-		{
-			
+		{			
 			FHitResult hit;
 			if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery7, true, hit))
 			{
 				if (hit.GetActor() != nullptr)
-				{
-					
+				{					
 					auto building = Cast<ABaseBuildingBase>(hit.GetActor());
 					if (building != nullptr)
 					{
-						
 						FinishDestroyingBuildings(building);
 					}
-					else
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, hit.GetActor()->GetClass()->GetDisplayNameText().ToString());
-					}
 				}
-
 			}
 		}
+	}
+}
+
+void AManagementPlayer::RemoveItemsFromInventory(TArray<FBuidingItemInfo> items)
+{
+	if (items.Num() > 0 && Info->StoredItems.Num() > 0)
+	{
+		for (int i = 0; i < items.Num(); i++)
+		{
+			for (int u = 0; u < Info->StoredItems.Num(); u++)
+			{
+				if (items[i].Name == Info->StoredItems[i].Name)
+				{
+					Info->StoredItems[i].Amount -= items[i].Amount;
+
+					if (Info->StoredItems[i].Amount < 0) { Info->StoredItems[i].Amount = 0; }
+				}
+			}
+		}
+	}
+}
+
+
+void AManagementPlayer::AddItemToInventory(FBuidingItemInfo item)
+{
+	if (Info->StoredItems.Num() > 0)
+	{
+		for (int i = 0; i < Info->StoredItems.Num(); i++)
+		{
+			if (Info->StoredItems[i].Name == item.Name)
+			{
+				Info->StoredItems[i].Amount += item.Amount;
+			}
+		}
+	}
+	else 
+	{
+		Info->StoredItems.Add(item);
 	}
 }
 
@@ -205,7 +254,43 @@ void AManagementPlayer::StartBuilding_Implementation(TSubclassOf<ABaseBuildingBa
 
 bool AManagementPlayer::CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase> BuildingClass)
 {
-	if (!bBuilding) { return true; }
+	if (!bBuilding)
+	{
+		if (Info != nullptr)
+		{
+			if (BuildingClass.GetDefaultObject()->NeededItems.Num() == 0) { return true; }
+			auto buildClass = BuildingClass.GetDefaultObject();
+			if (Info->StoredItems.Num() > 0)
+			{
+				TArray<FString> Keys;
+				buildClass->NeededItems.GetKeys(Keys);
+
+				for (int i = 0; i < Keys.Num(); i++)
+				{
+					
+					bool found = false;
+					for (int u = 0; u < Info->StoredItems.Num(); u++) 
+					{					
+						if (Keys[i] == Info->StoredItems[u].Name) 
+						{
+						
+							found = true;
+							if (buildClass->NeededItems.Find(Keys[i]) != nullptr)
+							{
+							
+								if (Info->StoredItems[u].Amount < *buildClass->NeededItems.Find(Keys[i]))
+								{
+									return false;
+								}
+							}
+						}
+					}
+					if (!found) { return false; }
+				}
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
