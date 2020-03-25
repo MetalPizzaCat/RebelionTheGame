@@ -214,11 +214,12 @@ bool AManagementPlayer::CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase>
 					for (int u = 0; u < Info->StoredItems.Num(); u++) 
 					{					
 						if (Keys[i] == Info->StoredItems[u].Name) 
-
+						{
+						
 							found = true;
 							if (buildClass->NeededItems.Find(Keys[i]) != nullptr)
 							{
-
+								GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::FromInt(*buildClass->NeededItems.Find(Keys[i])));
 								if (Info->StoredItems[u].Amount < *buildClass->NeededItems.Find(Keys[i]))
 								{
 									return false;
