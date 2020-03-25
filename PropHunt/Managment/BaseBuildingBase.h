@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PropHunt/Managment/ItemInfo.h"
 #include "BaseBuildingBase.generated.h"
 
 UCLASS()
@@ -26,6 +27,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		bool bBuilt = false;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TMap<FString,int>NeededItems;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void OnBuildFinished();
 
@@ -36,7 +40,9 @@ public:
 
 	void OnBuildStarted_Implementation() {}
 
+	/*USE ONLY FOR COLLISION CHECKS, EVERYTHING ELSE IS LOCATED IN MANAGEMENT PLAYER*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		/*USE ONLY FOR COLLISION CHECKS, EVERYTHING ELSE IS LOCATED IN MANAGEMENT PLAYER*/
 		bool CanBeBuilt();
 	
 

@@ -115,29 +115,20 @@ void AManagementPlayer::StartDestroyingBuildings()
 {
 	
 	if (!bBuilding)
-	{
-		
+	{		
 		if (PController != nullptr)
-		{
-			
+		{			
 			FHitResult hit;
 			if (PController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery7, true, hit))
 			{
 				if (hit.GetActor() != nullptr)
-				{
-					
+				{					
 					auto building = Cast<ABaseBuildingBase>(hit.GetActor());
 					if (building != nullptr)
 					{
-						
 						FinishDestroyingBuildings(building);
 					}
-					else
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, hit.GetActor()->GetClass()->GetDisplayNameText().ToString());
-					}
 				}
-
 			}
 		}
 	}
@@ -205,7 +196,42 @@ void AManagementPlayer::StartBuilding_Implementation(TSubclassOf<ABaseBuildingBa
 
 bool AManagementPlayer::CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase> BuildingClass)
 {
-	if (!bBuilding) { return true; }
+	if (!bBuilding)
+	{
+		if (Info != nullptr)
+		{
+			if (BuildingClass.GetDefaultObject()->NeededItems.Num() == 0) { return true; }
+			auto buildClass = BuildingClass.GetDefaultObject();
+			if (Info->StoredItems.Num() > 0)
+			{
+				TArray<FString> Keys;
+				buildClass->NeededItems.GetKeys(Keys);
+
+				for (int i = 0; i < Keys.Num(); i++)
+				{
+					
+					bool found = false;
+					for (int u = 0; u < Info->StoredItems.Num(); u++) 
+					{					
+						if (Keys[i] == Info->StoredItems[u].Name) 
+
+							found = true;
+							if (buildClass->NeededItems.Find(Keys[i]) != nullptr)
+							{
+
+								if (Info->StoredItems[u].Amount < *buildClass->NeededItems.Find(Keys[i]))
+								{
+									return false;
+								}
+							}
+						}
+					}
+					if (!found) { return false; }
+				}
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
