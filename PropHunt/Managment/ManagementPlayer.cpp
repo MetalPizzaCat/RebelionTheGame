@@ -219,7 +219,7 @@ bool AManagementPlayer::CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase>
 							found = true;
 							if (buildClass->NeededItems.Find(Keys[i]) != nullptr)
 							{
-								GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::FromInt(*buildClass->NeededItems.Find(Keys[i])));
+							
 								if (Info->StoredItems[u].Amount < *buildClass->NeededItems.Find(Keys[i]))
 								{
 									return false;
