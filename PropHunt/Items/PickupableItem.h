@@ -3,29 +3,40 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Interface.h"
+#include "GameFramework/Actor.h"
 #include "PropHunt/Managment/BaseBuildingBase.h"
-#include "ManagmentInterface.generated.h"
+#include "PropHunt/InteractionInterface.h"
+#include "PickupableItem.generated.h"
 
-// This class does not need to be modified.
-UINTERFACE(MinimalAPI)
-class UManagmentInterface : public UInterface
+UCLASS()
+class PROPHUNT_API APickupableItem : public AActor,public IInteractionInterface
 {
 	GENERATED_BODY()
-};
+	
+public:	
+	// Sets default values for this actor's properties
+	APickupableItem();
 
-/**
- * 
- */
-class PROPHUNT_API IManagmentInterface
-{
-	GENERATED_BODY()
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
-public:
+public:	
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TArray<FBuidingItemInfo> StoredItems;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void Interact(AActor* interactor, UPrimitiveComponent* interactedComponent);
 
+	void Interact_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)override;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		bool GiveItem(FBuidingItemInfo item);
+		void OnFinishedGivingItems(bool AllItemsWereGiven);
+
+	void OnFinishedGivingItems_Implementation(bool AllItemsWereGiven) { Destroy(); }
+
 };

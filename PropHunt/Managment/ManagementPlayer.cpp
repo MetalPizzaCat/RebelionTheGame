@@ -209,6 +209,15 @@ void AManagementPlayer::FinishDestroyingBuildings(ABaseBuildingBase* building)
 			}
 			if (id != -1)
 			{
+				if (Info->Buildings[id]->NeededItems.Num() > 0)
+				{
+					TArray<FString>Keys;
+					Info->Buildings[id]->NeededItems.GetKeys(Keys);
+					for (int i = 0; i < Keys.Num(); i++)
+					{			
+						AddItemToInventory(FBuidingItemInfo(Keys[i], Info->Buildings[id]->NeededItems.Find(Keys[i])==nullptr?0: *Info->Buildings[id]->NeededItems.Find(Keys[i])));
+					}
+				}
 				Info->Buildings[id]->Destroy();
 				Info->Buildings.RemoveAt(id);
 			}
