@@ -29,6 +29,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		TArray<FBuidingItemInfo> StoredItems;
 
+	UFUNCTION(BlueprintCallable)
+		void AddItemToStorage(FBuidingItemInfo item);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
