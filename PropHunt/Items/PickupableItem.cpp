@@ -3,6 +3,7 @@
 
 #include "PickupableItem.h"
 #include "PropHunt/Managment/ManagmentInterface.h"
+#include "Engine.h"
 
 // Sets default values
 APickupableItem::APickupableItem()
@@ -33,15 +34,65 @@ void APickupableItem::Interact_Implementation(AActor* interactor, UPrimitiveComp
 		if (StoredItems.Num() > 0)
 		{
 			bool GaveAllItems = true;
+			TArray<FBuidingItemInfo>NotGivenItems;
 			for (int i = 0; i < StoredItems.Num(); i++)
 			{
-				if (!IManagmentInterface::Execute_GiveItem(interactor, StoredItems[i]))
+				int left = 0;
+				bool ResultOfGiving = IManagmentInterface::Execute_GiveItem(interactor, StoredItems[i], left);
+				if (!ResultOfGiving)
 				{
+					NotGivenItems.Add(StoredItems[i]);
 					GaveAllItems = false;
+					break;
 				}
+				else if (ResultOfGiving && left > 0)
+				{
+					NotGivenItems.Add(FBuidingItemInfo(StoredItems[i].Name, StoredItems[i].Amount - left));
+					GaveAllItems = false;
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::FromInt(left));
+					break;
+				}
+				
 			}
-			OnFinishedGivingItems(GaveAllItems);
+			OnFinishedGivingItems(GaveAllItems, NotGivenItems);
 		}
+	}
+}
+
+void APickupableItem::RemoveItem(FBuidingItemInfo item)
+{
+	if (StoredItems.Num() > 0)
+	{
+		for (int i = 0; i < StoredItems.Num(); i++)
+		{
+			if (StoredItems[i].Name == item.Name)
+			{
+				StoredItems[i].Amount -= item.Amount;
+			}
+		}
+	}
+}
+
+void APickupableItem::RemoveSomeItems(TArray<FBuidingItemInfo> Items)
+{
+	if (Items.Num() > 0)
+	{
+		for (int i = 0; i < Items.Num(); i++) 
+		{
+			RemoveItem(Items[i]);
+		}
+	}
+}
+
+void APickupableItem::OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems)
+{
+	if (!AllItemsWereGiven)
+	{
+		RemoveSomeItems(NotGivenItems);
+	}
+	else
+	{
+		Destroy();
 	}
 }
 

@@ -23,6 +23,7 @@ protected:
 
 public:	
 
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		TArray<FBuidingItemInfo> StoredItems;
 
@@ -34,9 +35,15 @@ public:
 
 	void Interact_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)override;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnFinishedGivingItems(bool AllItemsWereGiven);
+	UFUNCTION(BlueprintCallable)
+		void RemoveItem(FBuidingItemInfo item);
 
-	void OnFinishedGivingItems_Implementation(bool AllItemsWereGiven) { Destroy(); }
+	UFUNCTION(BlueprintCallable)
+		void RemoveSomeItems(TArray<FBuidingItemInfo> Items);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void OnFinishedGivingItems(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems);
+
+	void OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems);
 
 };

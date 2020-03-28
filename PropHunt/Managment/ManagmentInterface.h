@@ -27,5 +27,5 @@ public:
 		void Interact(AActor* interactor, UPrimitiveComponent* interactedComponent);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		bool GiveItem(FBuidingItemInfo item);
+		bool GiveItem(FBuidingItemInfo item,int& AmountLeft);
 };
