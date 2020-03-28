@@ -41,9 +41,33 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void RemoveSomeItems(TArray<FBuidingItemInfo> Items);
 
+	UFUNCTION(BlueprintCallable)
+		void CheckWhatsLeft();
+
+	UFUNCTION(BlueprintPure)
+		FBuidingItemInfo GetItemAndIdByName(FString name,int&id);
+
+	UFUNCTION(BlueprintPure)
+		FBuidingItemInfo GetItemByName(FString name);
+
+	/*Usual pick up function but only thinks about items with that name*/
+	UFUNCTION(BlueprintCallable)
+		/*Usual pick up function but only thinks about items with that name*/
+		bool PickupSpecificItem(AActor* interactor,FString ItemName,int &Left);
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void OnFinishedGivingItems(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems);
 
 	void OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void OnGaveItem(const FString& ItemName);
+
+	void OnGaveItem_Implementation(const FString& ItemName) { CheckWhatsLeft(); }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void OnNothingLeft();
+
+	void OnNothingLeft_Implementation() { Destroy(); }
 
 };

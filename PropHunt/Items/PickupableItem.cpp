@@ -5,6 +5,9 @@
 #include "PropHunt/Managment/ManagmentInterface.h"
 #include "Engine.h"
 
+//#define DEBUG_PICKUP_ITEM_METAL
+//#define DEBUG_PICKUP_ALL
+
 // Sets default values
 APickupableItem::APickupableItem()
 {
@@ -29,6 +32,23 @@ void APickupableItem::Tick(float DeltaTime)
 
 void APickupableItem::Interact_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)
 {
+#ifdef DEBUG_PICKUP_ITEM_METAL
+	int left = 0;
+	bool GaveAllItems = true;
+	bool ResultOfGiving = PickupSpecificItem(interactor, "Metal", left);
+	if (ResultOfGiving)
+	{
+		int id = -1;
+		GetItemAndIdByName("Metal", id);
+		if (id != -1)
+		{
+			StoredItems[id].Amount = left;
+		}
+		
+	}
+	OnGaveItem("Metal");
+	
+#elif defined DEBUG_PICKUP_ALL
 	if (interactor->Implements<UManagmentInterface>() || (Cast<IManagmentInterface>(interactor) != nullptr))
 	{
 		if (StoredItems.Num() > 0)
@@ -52,11 +72,12 @@ void APickupableItem::Interact_Implementation(AActor* interactor, UPrimitiveComp
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::FromInt(left));
 					break;
 				}
-				
+
 			}
 			OnFinishedGivingItems(GaveAllItems, NotGivenItems);
 		}
 	}
+#endif // ITEMTEST	
 }
 
 void APickupableItem::RemoveItem(FBuidingItemInfo item)
@@ -82,6 +103,73 @@ void APickupableItem::RemoveSomeItems(TArray<FBuidingItemInfo> Items)
 			RemoveItem(Items[i]);
 		}
 	}
+}
+
+void APickupableItem::CheckWhatsLeft()
+{
+
+	if (StoredItems.Num() > 0)
+	{
+		bool IsSomethingLeft = false;
+		for (int i = 0; i < StoredItems.Num(); i++)
+		{
+			if (StoredItems[i].Amount > 0) { IsSomethingLeft = true; break; }
+		}
+		if(!IsSomethingLeft){ OnNothingLeft(); }
+	}
+	else
+	{
+		OnNothingLeft();
+	}
+}
+
+FBuidingItemInfo APickupableItem::GetItemAndIdByName(FString name, int& id)
+{
+	if (StoredItems.Num() > 0)
+	{
+		for (int i = 0; i < StoredItems.Num(); i++)
+		{
+			if (StoredItems[i].Name == name)
+			{
+				id = i;
+				return StoredItems[i];
+			}
+		}
+	}
+	return FBuidingItemInfo();
+}
+
+FBuidingItemInfo APickupableItem::GetItemByName(FString name)
+{
+	if (StoredItems.Num() > 0)
+	{
+		for (int i = 0; i < StoredItems.Num(); i++)
+		{
+			if (StoredItems[i].Name == name)
+			{
+				return StoredItems[i];
+			}
+		}
+	}
+	return FBuidingItemInfo();
+}
+
+bool APickupableItem::PickupSpecificItem(AActor* interactor, FString ItemName, int& Left)
+{
+	if (interactor->Implements<UManagmentInterface>() || (Cast<IManagmentInterface>(interactor) != nullptr))
+	{
+		if (StoredItems.Num() > 0)
+		{
+			for (int i = 0; i < StoredItems.Num(); i++)
+			{
+				if (StoredItems[i].Name == ItemName)
+				{
+					return IManagmentInterface::Execute_GiveItem(interactor, StoredItems[i], Left);
+				}
+			}
+		}
+	}
+	return false;
 }
 
 void APickupableItem::OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems)
