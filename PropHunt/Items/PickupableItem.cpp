@@ -32,6 +32,16 @@ void APickupableItem::Tick(float DeltaTime)
 
 void APickupableItem::Interact_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)
 {
+	if (interactor != nullptr)
+	{
+		if (interactor->Implements<UManagmentInterface>() || (Cast<IManagmentInterface>(interactor) != nullptr))
+		{
+			if (IManagmentInterface::Execute_RequestDisplayInteractionWidget(interactor, this))
+			{
+				//on success, right now nothing is supposed to happen
+			}
+		}
+	}
 #ifdef DEBUG_PICKUP_ITEM_METAL
 	int left = 0;
 	bool GaveAllItems = true;
@@ -105,7 +115,7 @@ void APickupableItem::RemoveSomeItems(TArray<FBuidingItemInfo> Items)
 	}
 }
 
-void APickupableItem::CheckWhatsLeft()
+void APickupableItem::CheckWhatsLeft(AActor* interactor)
 {
 
 	if (StoredItems.Num() > 0)
@@ -115,12 +125,30 @@ void APickupableItem::CheckWhatsLeft()
 		{
 			if (StoredItems[i].Amount > 0) { IsSomethingLeft = true; break; }
 		}
-		if(!IsSomethingLeft){ OnNothingLeft(); }
+		if(!IsSomethingLeft){ OnNothingLeft(interactor); }
 	}
 	else
 	{
-		OnNothingLeft();
+		OnNothingLeft(interactor);
 	}
+}
+
+void APickupableItem::ProccessGivingItem(FString Name,AActor*pickuper)
+{
+	int left = 0;
+	bool GaveAllItems = true;
+	bool ResultOfGiving = PickupSpecificItem(pickuper, Name, left);
+	if (ResultOfGiving)
+	{
+		int id = -1;
+		GetItemAndIdByName(Name, id);
+		if (id != -1)
+		{
+			StoredItems[id].Amount = left;
+		}
+
+	}
+	OnGaveItem(Name, pickuper);
 }
 
 FBuidingItemInfo APickupableItem::GetItemAndIdByName(FString name, int& id)
@@ -182,5 +210,17 @@ void APickupableItem::OnFinishedGivingItems_Implementation(bool AllItemsWereGive
 	{
 		Destroy();
 	}
+}
+
+void APickupableItem::OnNothingLeft_Implementation(AActor* interactor)
+{
+	if (interactor != nullptr)
+	{
+		if (interactor->Implements<UManagmentInterface>() || (Cast<IManagmentInterface>(interactor) != nullptr))
+		{
+			IManagmentInterface::Execute_RequestHideContainerDisplay(interactor);
+		}
+	}
+	Destroy();
 }
 
