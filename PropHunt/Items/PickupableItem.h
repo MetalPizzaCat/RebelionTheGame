@@ -42,7 +42,10 @@ public:
 		void RemoveSomeItems(TArray<FBuidingItemInfo> Items);
 
 	UFUNCTION(BlueprintCallable)
-		void CheckWhatsLeft();
+		void CheckWhatsLeft(AActor* interactor);
+
+	UFUNCTION(BlueprintCallable)
+		void ProccessGivingItem(FString Name,AActor*pickuper);
 
 	UFUNCTION(BlueprintPure)
 		FBuidingItemInfo GetItemAndIdByName(FString name,int&id);
@@ -61,13 +64,13 @@ public:
 	void OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnGaveItem(const FString& ItemName);
+		void OnGaveItem(const FString& ItemName, AActor* interactor);
 
-	void OnGaveItem_Implementation(const FString& ItemName) { CheckWhatsLeft(); }
+	void OnGaveItem_Implementation(const FString& ItemName, AActor* interactor) { CheckWhatsLeft(interactor); }
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnNothingLeft();
+		void OnNothingLeft(AActor* interactor);
 
-	void OnNothingLeft_Implementation() { Destroy(); }
+	void OnNothingLeft_Implementation(AActor* interactor);
 
 };

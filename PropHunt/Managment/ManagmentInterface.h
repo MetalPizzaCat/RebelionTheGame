@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "PropHunt/Managment/BaseBuildingBase.h"
+#include "PropHunt/Items/PickupableItem.h"
 #include "ManagmentInterface.generated.h"
 
 // This class does not need to be modified.
@@ -28,4 +29,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		bool GiveItem(FBuidingItemInfo item,int& AmountLeft);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category=PlayerHUDInteraction)
+		bool RequestDisplayInteractionWidget(APickupableItem*item);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = PlayerHUDInteraction)
+		bool RequestHideContainerDisplay();
 };
