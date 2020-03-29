@@ -49,7 +49,7 @@ void AWeaponBase::SpawnBulletNotServer(FVector location, FRotator rotation)
 		bullet->Damage = PrimaryDamage;
 		bullet->SetOwner(WeaponOwner);
 		bullet->StartLocation = location;
-
+		bullet->GetCollisionComp()->IgnoreActorWhenMoving(WeaponOwner, true);
 	}
 }
 
@@ -212,6 +212,7 @@ void AWeaponBase::ServerPrimaryFire_Implementation(FVector location, FRotator ro
 		bullet->Damage = PrimaryDamage;
 		bullet->SetOwner(WeaponOwner);
 		bullet->StartLocation = location;
+		bullet->GetCollisionComp()->IgnoreActorWhenMoving(WeaponOwner, true);
 	}
 }
 
