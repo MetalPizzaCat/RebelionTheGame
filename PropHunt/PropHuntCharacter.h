@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
+#include "Perception/AISightTargetInterface.h"
 #include "PropHuntCharacter.generated.h"
 
 class UInputComponent;
@@ -14,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSprinting);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopSprinting);
 
 UCLASS(config=Game)
-class APropHuntCharacter : public ACharacter
+class APropHuntCharacter : public ACharacter, public IAISightTargetInterface
 {
 	GENERATED_BODY()
 
@@ -214,6 +215,14 @@ protected:
 	// End of APawn interface
 
 public:
+	virtual bool CanBeSeenFrom(
+		const FVector& ObserverLocation,
+		FVector& OutSeenLocation,
+		int32& NumberOfLoSChecksPerformed,
+		float& OutSightStrength,
+		const AActor* IgnoreActor = NULL
+	) const;
+
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
