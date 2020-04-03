@@ -25,7 +25,7 @@ public:
 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<FBuidingItemInfo> StoredItems;
+		TArray<FBuildingItemInfo> StoredItems;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -36,10 +36,10 @@ public:
 	void Interact_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)override;
 
 	UFUNCTION(BlueprintCallable)
-		void RemoveItem(FBuidingItemInfo item);
+		void RemoveItem(FBuildingItemInfo item);
 
 	UFUNCTION(BlueprintCallable)
-		void RemoveSomeItems(TArray<FBuidingItemInfo> Items);
+		void RemoveSomeItems(TArray<FBuildingItemInfo> Items);
 
 	UFUNCTION(BlueprintCallable)
 		void CheckWhatsLeft(AActor* interactor);
@@ -48,10 +48,10 @@ public:
 		void ProccessGivingItem(FString Name,AActor*pickuper);
 
 	UFUNCTION(BlueprintPure)
-		FBuidingItemInfo GetItemAndIdByName(FString name,int&id);
+		FBuildingItemInfo GetItemAndIdByName(FString name,int&id);
 
 	UFUNCTION(BlueprintPure)
-		FBuidingItemInfo GetItemByName(FString name);
+		FBuildingItemInfo GetItemByName(FString name);
 
 	/*Usual pick up function but only thinks about items with that name*/
 	UFUNCTION(BlueprintCallable)
@@ -59,9 +59,9 @@ public:
 		bool PickupSpecificItem(AActor* interactor,FString ItemName,int &Left);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnFinishedGivingItems(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems);
+		void OnFinishedGivingItems(bool AllItemsWereGiven, const TArray<FBuildingItemInfo>& NotGivenItems);
 
-	void OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems);
+	void OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuildingItemInfo>& NotGivenItems);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void OnGaveItem(const FString& ItemName, AActor* interactor);

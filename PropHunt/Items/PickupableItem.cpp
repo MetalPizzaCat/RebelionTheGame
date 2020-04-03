@@ -64,7 +64,7 @@ void APickupableItem::Interact_Implementation(AActor* interactor, UPrimitiveComp
 		if (StoredItems.Num() > 0)
 		{
 			bool GaveAllItems = true;
-			TArray<FBuidingItemInfo>NotGivenItems;
+			TArray<FBuildingItemInfo>NotGivenItems;
 			for (int i = 0; i < StoredItems.Num(); i++)
 			{
 				int left = 0;
@@ -77,7 +77,7 @@ void APickupableItem::Interact_Implementation(AActor* interactor, UPrimitiveComp
 				}
 				else if (ResultOfGiving && left > 0)
 				{
-					NotGivenItems.Add(FBuidingItemInfo(StoredItems[i].Name, StoredItems[i].Amount - left));
+					NotGivenItems.Add(FBuildingItemInfo(StoredItems[i].Name, StoredItems[i].Amount - left));
 					GaveAllItems = false;
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::FromInt(left));
 					break;
@@ -90,7 +90,7 @@ void APickupableItem::Interact_Implementation(AActor* interactor, UPrimitiveComp
 #endif // ITEMTEST	
 }
 
-void APickupableItem::RemoveItem(FBuidingItemInfo item)
+void APickupableItem::RemoveItem(FBuildingItemInfo item)
 {
 	if (StoredItems.Num() > 0)
 	{
@@ -104,7 +104,7 @@ void APickupableItem::RemoveItem(FBuidingItemInfo item)
 	}
 }
 
-void APickupableItem::RemoveSomeItems(TArray<FBuidingItemInfo> Items)
+void APickupableItem::RemoveSomeItems(TArray<FBuildingItemInfo> Items)
 {
 	if (Items.Num() > 0)
 	{
@@ -151,7 +151,7 @@ void APickupableItem::ProccessGivingItem(FString Name,AActor*pickuper)
 	OnGaveItem(Name, pickuper);
 }
 
-FBuidingItemInfo APickupableItem::GetItemAndIdByName(FString name, int& id)
+FBuildingItemInfo APickupableItem::GetItemAndIdByName(FString name, int& id)
 {
 	if (StoredItems.Num() > 0)
 	{
@@ -164,10 +164,10 @@ FBuidingItemInfo APickupableItem::GetItemAndIdByName(FString name, int& id)
 			}
 		}
 	}
-	return FBuidingItemInfo();
+	return FBuildingItemInfo();
 }
 
-FBuidingItemInfo APickupableItem::GetItemByName(FString name)
+FBuildingItemInfo APickupableItem::GetItemByName(FString name)
 {
 	if (StoredItems.Num() > 0)
 	{
@@ -179,7 +179,7 @@ FBuidingItemInfo APickupableItem::GetItemByName(FString name)
 			}
 		}
 	}
-	return FBuidingItemInfo();
+	return FBuildingItemInfo();
 }
 
 bool APickupableItem::PickupSpecificItem(AActor* interactor, FString ItemName, int& Left)
@@ -200,7 +200,7 @@ bool APickupableItem::PickupSpecificItem(AActor* interactor, FString ItemName, i
 	return false;
 }
 
-void APickupableItem::OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuidingItemInfo>& NotGivenItems)
+void APickupableItem::OnFinishedGivingItems_Implementation(bool AllItemsWereGiven, const TArray<FBuildingItemInfo>& NotGivenItems)
 {
 	if (!AllItemsWereGiven)
 	{

@@ -3,7 +3,7 @@
 
 #include "MainGameInstance.h"
 
-void UMainGameInstance::AddItemToStorage(FBuidingItemInfo item)
+void UMainGameInstance::AddItemToStorage(FBuildingItemInfo item)
 {
 	if (StoredItems.Num() > 0)
 	{

@@ -22,8 +22,8 @@ public:
         TArray<ABaseBuildingBase*> Buildings;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-        TArray<FBuidingItemInfo> StoredItems;
+        TArray<FBuildingItemInfo> StoredItems;
 
     UFUNCTION(BlueprintCallable)
-        void AddItemToStorage(FBuidingItemInfo item);
+        void AddItemToStorage(FBuildingItemInfo item);
 };

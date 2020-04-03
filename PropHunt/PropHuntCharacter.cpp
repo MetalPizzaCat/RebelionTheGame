@@ -18,6 +18,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //#define PERCEPTION_TEST
 
+//#define USEDEFAULTMESHSYSTEM
 
 //////////////////////////////////////////////////////////////////////////
 // APropHuntCharacter
@@ -37,6 +38,7 @@ APropHuntCharacter::APropHuntCharacter()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+	
 	PlayerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PlayerMesh"));
 	PlayerMesh->SetRelativeRotation(FRotator(0.f,0.f,-90.f));
 	PlayerMesh->SetRelativeLocation(FVector(0.f, 0.f, -95.f));
@@ -56,6 +58,12 @@ APropHuntCharacter::APropHuntCharacter()
 
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
+
+#ifndef USEDEFAULTMESHSYSTEM
+	PlayerMesh->SetupAttachment(FirstPersonCameraComponent);
+#endif // !USEDEFAULTMESHSYSTEM
+
+	
 
 	
 	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun 

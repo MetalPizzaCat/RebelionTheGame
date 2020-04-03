@@ -14,7 +14,9 @@ AWeaponBase::AWeaponBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	SetRootComponent(WeaponMesh);
+	//SetRootComponent(WeaponMesh);
+
+	RootComponent = WeaponMesh;
 
 
 	CapsuleCollisionComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapluseCollision"));

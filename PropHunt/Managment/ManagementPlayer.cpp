@@ -72,7 +72,7 @@ void AManagementPlayer::FinishBuilding()
 			//deduct how much items will be removed from storage
 
 			TArray<FString>Keys;
-			TArray<FBuidingItemInfo>ItemsToRemove;
+			TArray<FBuildingItemInfo>ItemsToRemove;
 			CurrentBuilding->NeededItems.GetKeys(Keys);
 			if (Keys.Num() > 0)
 			{
@@ -80,7 +80,7 @@ void AManagementPlayer::FinishBuilding()
 				{
 					if (CurrentBuilding->NeededItems.Find(Keys[i]) != nullptr)
 					{
-						ItemsToRemove.Add(FBuidingItemInfo(Keys[i], *CurrentBuilding->NeededItems.Find(Keys[i])));
+						ItemsToRemove.Add(FBuildingItemInfo(Keys[i], *CurrentBuilding->NeededItems.Find(Keys[i])));
 					}
 				}
 
@@ -154,7 +154,7 @@ void AManagementPlayer::StartDestroyingBuildings()
 	}
 }
 
-void AManagementPlayer::RemoveItemsFromInventory(TArray<FBuidingItemInfo> items)
+void AManagementPlayer::RemoveItemsFromInventory(TArray<FBuildingItemInfo> items)
 {
 	if (items.Num() > 0 && Info->StoredItems.Num() > 0)
 	{
@@ -174,7 +174,7 @@ void AManagementPlayer::RemoveItemsFromInventory(TArray<FBuidingItemInfo> items)
 }
 
 
-void AManagementPlayer::AddItemToInventory(FBuidingItemInfo item)
+void AManagementPlayer::AddItemToInventory(FBuildingItemInfo item)
 {
 	if (Info->StoredItems.Num() > 0)
 	{
@@ -215,7 +215,7 @@ void AManagementPlayer::FinishDestroyingBuildings(ABaseBuildingBase* building)
 					Info->Buildings[id]->NeededItems.GetKeys(Keys);
 					for (int i = 0; i < Keys.Num(); i++)
 					{			
-						AddItemToInventory(FBuidingItemInfo(Keys[i], Info->Buildings[id]->NeededItems.Find(Keys[i])==nullptr?0: *Info->Buildings[id]->NeededItems.Find(Keys[i])));
+						AddItemToInventory(FBuildingItemInfo(Keys[i], Info->Buildings[id]->NeededItems.Find(Keys[i])==nullptr?0: *Info->Buildings[id]->NeededItems.Find(Keys[i])));
 					}
 				}
 				Info->Buildings[id]->Destroy();
