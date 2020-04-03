@@ -8,7 +8,7 @@
 #include "ItemInfo.generated.h"
 
 USTRUCT(BlueprintType)
-struct FBuidingItemInfo : public FTableRowBase
+struct FBuildingItemInfo : public FTableRowBase
 {
 	GENERATED_BODY()
 public:
@@ -20,11 +20,21 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FText Description;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere,Category=Keys)
+		bool bIsKey = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
+		int KeyId = 0;
 	
 
-	FBuidingItemInfo() {}
+	FBuildingItemInfo() {}
 
-	FBuidingItemInfo(FString _Name, int _Amount, FText _Description) :Name(_Name), Amount(_Amount), Description(_Description) {}
+	FBuildingItemInfo(FString _Name, int _Amount, FText _Description) :Name(_Name), Amount(_Amount), Description(_Description) {}
 
-	FBuidingItemInfo(FString _Name, int _Amount) :Name(_Name), Amount(_Amount){}
+	FBuildingItemInfo(FString _Name, int _Amount) :Name(_Name), Amount(_Amount){}
+
+	FBuildingItemInfo(FString _Name, int _Amount, FText _Description, bool _bIsKey, int _KeyId) :Name(_Name), Amount(_Amount), Description(_Description), bIsKey(_bIsKey), KeyId(_KeyId){}
+
+	FBuildingItemInfo(FString _Name, int _Amount, bool _bIsKey, int _KeyId) :Name(_Name), Amount(_Amount), bIsKey(_bIsKey), KeyId(_KeyId) {}
 };

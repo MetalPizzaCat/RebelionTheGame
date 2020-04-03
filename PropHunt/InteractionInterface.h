@@ -28,4 +28,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		bool AddHealth(float amountOfHealth);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Keys)
+		bool HasKeyWithId(int id);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Keys)
+		bool RemoveKey(int KeyId);
 };

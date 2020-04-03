@@ -14,7 +14,7 @@ ABaseInfo::ABaseInfo()
 	Billboard->bHiddenInGame = true;
 }
 
-void ABaseInfo::AddItemToStorage(FBuidingItemInfo item)
+void ABaseInfo::AddItemToStorage(FBuildingItemInfo item)
 {
 	if (StoredItems.Num() > 0)
 	{

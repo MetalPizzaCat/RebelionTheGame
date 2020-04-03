@@ -28,7 +28,7 @@ public:
 		void Interact(AActor* interactor, UPrimitiveComponent* interactedComponent);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		bool GiveItem(FBuidingItemInfo item,int& AmountLeft);
+		bool GiveItem(FBuildingItemInfo item,int& AmountLeft);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category=PlayerHUDInteraction)
 		bool RequestDisplayInteractionWidget(APickupableItem*item);
