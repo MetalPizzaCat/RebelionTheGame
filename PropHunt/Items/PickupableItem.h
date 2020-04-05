@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PropHunt/Managment/BaseBuildingBase.h"
+#include "PropHunt/Items/InventoryComponent.h"
 #include "PropHunt/InteractionInterface.h"
 #include "PickupableItem.generated.h"
 
@@ -22,10 +23,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<FBuildingItemInfo> StoredItems;
+		UInventoryComponent* Inventory;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -35,23 +34,12 @@ public:
 
 	void Interact_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)override;
 
-	UFUNCTION(BlueprintCallable)
-		void RemoveItem(FBuildingItemInfo item);
-
-	UFUNCTION(BlueprintCallable)
-		void RemoveSomeItems(TArray<FBuildingItemInfo> Items);
 
 	UFUNCTION(BlueprintCallable)
 		void CheckWhatsLeft(AActor* interactor);
 
 	UFUNCTION(BlueprintCallable)
 		void ProccessGivingItem(FString Name,AActor*pickuper);
-
-	UFUNCTION(BlueprintPure)
-		FBuildingItemInfo GetItemAndIdByName(FString name,int&id);
-
-	UFUNCTION(BlueprintPure)
-		FBuildingItemInfo GetItemByName(FString name);
 
 	/*Usual pick up function but only thinks about items with that name*/
 	UFUNCTION(BlueprintCallable)

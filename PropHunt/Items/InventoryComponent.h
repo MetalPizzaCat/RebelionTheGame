@@ -3,38 +3,57 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Components/BillboardComponent.h"
-#include "BaseBuildingBase.h"
+#include "Components/ActorComponent.h"
 #include "PropHunt/Managment/ItemInfo.h"
-#include "PropHunt/Items/InventoryComponent.h"
-#include "BaseInfo.generated.h"
+#include "InventoryComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemAdded, FBuildingItemInfo, Item,int,Amount);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemRemoved, FBuildingItemInfo, Item, int, Amount);
 
-UCLASS()
-class PROPHUNT_API ABaseInfo : public AActor
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), BlueprintType)
+class PROPHUNT_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
-	
+
 public:	
-	// Sets default values for this actor's properties
-	ABaseInfo();
+	// Sets default values for this component's properties
+	UInventoryComponent();
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-		UBillboardComponent* Billboard;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		TArray<ABaseBuildingBase*> Buildings;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		UInventoryComponent* Inventory;
 protected:
-	// Called when the game starts or when spawned
+	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(BlueprintAssignable)
+		FOnItemAdded OnItemAdded;
 
+	UPROPERTY(BlueprintAssignable)
+		FOnItemRemoved OnItemRemoved;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TArray<FBuildingItemInfo> StoredItems;
+
+	UFUNCTION(BlueprintCallable)
+		void RemoveItem(FBuildingItemInfo item);
+
+	UFUNCTION(BlueprintCallable)
+		void RemoveSomeItems(TArray<FBuildingItemInfo> Items);
+
+	UFUNCTION(BlueprintPure)
+		FBuildingItemInfo GetItemAndIdByName(FString name, int& id);
+
+	UFUNCTION(BlueprintPure)
+		FBuildingItemInfo GetItemByName(FString name);
+
+	UFUNCTION(BlueprintPure)
+		bool HasKey(int KeyId);
+
+	UFUNCTION(BlueprintCallable)
+		void AddItem(FBuildingItemInfo item);
+
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+		
 };

@@ -84,7 +84,11 @@ void AManagementPlayer::FinishBuilding()
 					}
 				}
 
-				RemoveItemsFromInventory(ItemsToRemove);
+				if (Info != nullptr)
+				{
+					Info->Inventory->RemoveSomeItems(ItemsToRemove);
+				}
+				
 			}
 
 
@@ -154,44 +158,6 @@ void AManagementPlayer::StartDestroyingBuildings()
 	}
 }
 
-void AManagementPlayer::RemoveItemsFromInventory(TArray<FBuildingItemInfo> items)
-{
-	if (items.Num() > 0 && Info->StoredItems.Num() > 0)
-	{
-		for (int i = 0; i < items.Num(); i++)
-		{
-			for (int u = 0; u < Info->StoredItems.Num(); u++)
-			{
-				if (items[i].Name == Info->StoredItems[i].Name)
-				{
-					Info->StoredItems[i].Amount -= items[i].Amount;
-
-					if (Info->StoredItems[i].Amount < 0) { Info->StoredItems[i].Amount = 0; }
-				}
-			}
-		}
-	}
-}
-
-
-void AManagementPlayer::AddItemToInventory(FBuildingItemInfo item)
-{
-	if (Info->StoredItems.Num() > 0)
-	{
-		for (int i = 0; i < Info->StoredItems.Num(); i++)
-		{
-			if (Info->StoredItems[i].Name == item.Name)
-			{
-				Info->StoredItems[i].Amount += item.Amount;
-			}
-		}
-	}
-	else 
-	{
-		Info->StoredItems.Add(item);
-	}
-}
-
 void AManagementPlayer::FinishDestroyingBuildings(ABaseBuildingBase* building)
 {
 	if (building != nullptr)
@@ -215,7 +181,7 @@ void AManagementPlayer::FinishDestroyingBuildings(ABaseBuildingBase* building)
 					Info->Buildings[id]->NeededItems.GetKeys(Keys);
 					for (int i = 0; i < Keys.Num(); i++)
 					{			
-						AddItemToInventory(FBuildingItemInfo(Keys[i], Info->Buildings[id]->NeededItems.Find(Keys[i])==nullptr?0: *Info->Buildings[id]->NeededItems.Find(Keys[i])));
+						Info->Inventory->AddItem(FBuildingItemInfo(Keys[i], Info->Buildings[id]->NeededItems.Find(Keys[i])==nullptr?0: *Info->Buildings[id]->NeededItems.Find(Keys[i])));
 					}
 				}
 				Info->Buildings[id]->Destroy();
@@ -269,7 +235,7 @@ bool AManagementPlayer::CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase>
 		{
 			if (BuildingClass.GetDefaultObject()->NeededItems.Num() == 0) { return true; }
 			auto buildClass = BuildingClass.GetDefaultObject();
-			if (Info->StoredItems.Num() > 0)
+			if (Info->Inventory->StoredItems.Num() > 0)
 			{
 				TArray<FString> Keys;
 				buildClass->NeededItems.GetKeys(Keys);
@@ -278,16 +244,16 @@ bool AManagementPlayer::CanBeBuilt_Implementation(TSubclassOf<ABaseBuildingBase>
 				{
 					
 					bool found = false;
-					for (int u = 0; u < Info->StoredItems.Num(); u++) 
+					for (int u = 0; u < Info->Inventory->StoredItems.Num(); u++)
 					{					
-						if (Keys[i] == Info->StoredItems[u].Name) 
+						if (Keys[i] == Info->Inventory->StoredItems[u].Name)
 						{
 						
 							found = true;
 							if (buildClass->NeededItems.Find(Keys[i]) != nullptr)
 							{
 							
-								if (Info->StoredItems[u].Amount < *buildClass->NeededItems.Find(Keys[i]))
+								if (Info->Inventory->StoredItems[u].Amount < *buildClass->NeededItems.Find(Keys[i]))
 								{
 									return false;
 								}
