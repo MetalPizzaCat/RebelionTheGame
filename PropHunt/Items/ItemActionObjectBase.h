@@ -3,44 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/UserDefinedStruct.h"
-#include "Engine/DataTable.h"
-#include "PropHunt/Items/ItemActionObjectBase.h"
-#include "ItemInfo.generated.h"
+#include "UObject/NoExportTypes.h"
+//#include "PropHunt/Managment/ItemInfo.h"
+#include "ItemActionObjectBase.generated.h"
 
-
-
-USTRUCT(BlueprintType)
-struct FBuildingItemInfo : public FTableRowBase
+/**
+ * 
+ */
+UCLASS(Blueprintable,BlueprintType)
+class PROPHUNT_API UItemActionObjectBase : public UObject
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FString Name;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		int Amount = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void PerformAction(APawn*Owner, const FString& ItemName);//if more variables needed to work, just add them as usual variable and setup them during constuction of object
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FText Description;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere,Category=Keys)
-		bool bIsKey = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-		int KeyId = 0;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Action)
-		TSubclassOf<UItemActionObjectBase> ItemAction;
-	
-
-	FBuildingItemInfo() {}
-
-	FBuildingItemInfo(FString _Name, int _Amount, FText _Description) :Name(_Name), Amount(_Amount), Description(_Description) {}
-
-	FBuildingItemInfo(FString _Name, int _Amount) :Name(_Name), Amount(_Amount){}
-
-	FBuildingItemInfo(FString _Name, int _Amount, FText _Description, bool _bIsKey, int _KeyId) :Name(_Name), Amount(_Amount), Description(_Description), bIsKey(_bIsKey), KeyId(_KeyId){}
-
-	FBuildingItemInfo(FString _Name, int _Amount, bool _bIsKey, int _KeyId) :Name(_Name), Amount(_Amount), bIsKey(_bIsKey), KeyId(_KeyId) {}
+	void PerformAction_Implementation(APawn* Owner, const FString& ItemName){/*nothing happenss yet*/ }
 };
