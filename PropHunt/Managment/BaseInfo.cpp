@@ -12,24 +12,8 @@ ABaseInfo::ABaseInfo()
 	Billboard = CreateDefaultSubobject<UBillboardComponent>(TEXT("Billboard"));
 	RootComponent = Billboard;
 	Billboard->bHiddenInGame = true;
-}
 
-void ABaseInfo::AddItemToStorage(FBuildingItemInfo item)
-{
-	if (StoredItems.Num() > 0)
-	{
-		for (int i = 0; i < StoredItems.Num(); i++)
-		{
-			if (StoredItems[i].Name == item.Name)
-			{
-				StoredItems[i].Amount += item.Amount;
-			}
-		}
-	}
-	else
-	{
-		StoredItems.Add(item);
-	}
+	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
 
 // Called when the game starts or when spawned

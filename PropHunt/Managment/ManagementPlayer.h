@@ -65,11 +65,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void StartDestroyingBuildings();
 
-	UFUNCTION(BlueprintCallable)
+	/*UFUNCTION(BlueprintCallable)
 		void RemoveItemsFromInventory(TArray<FBuildingItemInfo>items);
 
 	UFUNCTION(BlueprintCallable)
-		void AddItemToInventory(FBuildingItemInfo item);
+		void AddItemToInventory(FBuildingItemInfo item);*/
 
 	UFUNCTION(BlueprintCallable)
 		void FinishDestroyingBuildings(ABaseBuildingBase*building);

@@ -14,6 +14,7 @@ APickupableItem::APickupableItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
 
 // Called when the game starts or when spawned
@@ -90,40 +91,16 @@ void APickupableItem::Interact_Implementation(AActor* interactor, UPrimitiveComp
 #endif // ITEMTEST	
 }
 
-void APickupableItem::RemoveItem(FBuildingItemInfo item)
-{
-	if (StoredItems.Num() > 0)
-	{
-		for (int i = 0; i < StoredItems.Num(); i++)
-		{
-			if (StoredItems[i].Name == item.Name)
-			{
-				StoredItems[i].Amount -= item.Amount;
-			}
-		}
-	}
-}
-
-void APickupableItem::RemoveSomeItems(TArray<FBuildingItemInfo> Items)
-{
-	if (Items.Num() > 0)
-	{
-		for (int i = 0; i < Items.Num(); i++) 
-		{
-			RemoveItem(Items[i]);
-		}
-	}
-}
 
 void APickupableItem::CheckWhatsLeft(AActor* interactor)
 {
 
-	if (StoredItems.Num() > 0)
+	if (Inventory->StoredItems.Num() > 0)
 	{
 		bool IsSomethingLeft = false;
-		for (int i = 0; i < StoredItems.Num(); i++)
+		for (int i = 0; i < Inventory->StoredItems.Num(); i++)
 		{
-			if (StoredItems[i].Amount > 0) { IsSomethingLeft = true; break; }
+			if (Inventory->StoredItems[i].Amount > 0) { IsSomethingLeft = true; break; }
 		}
 		if(!IsSomethingLeft){ OnNothingLeft(interactor); }
 	}
@@ -141,58 +118,27 @@ void APickupableItem::ProccessGivingItem(FString Name,AActor*pickuper)
 	if (ResultOfGiving)
 	{
 		int id = -1;
-		GetItemAndIdByName(Name, id);
+		Inventory->GetItemAndIdByName(Name, id);
 		if (id != -1)
 		{
-			StoredItems[id].Amount = left;
+			Inventory->StoredItems[id].Amount = left;
 		}
 
 	}
 	OnGaveItem(Name, pickuper);
 }
 
-FBuildingItemInfo APickupableItem::GetItemAndIdByName(FString name, int& id)
-{
-	if (StoredItems.Num() > 0)
-	{
-		for (int i = 0; i < StoredItems.Num(); i++)
-		{
-			if (StoredItems[i].Name == name)
-			{
-				id = i;
-				return StoredItems[i];
-			}
-		}
-	}
-	return FBuildingItemInfo();
-}
-
-FBuildingItemInfo APickupableItem::GetItemByName(FString name)
-{
-	if (StoredItems.Num() > 0)
-	{
-		for (int i = 0; i < StoredItems.Num(); i++)
-		{
-			if (StoredItems[i].Name == name)
-			{
-				return StoredItems[i];
-			}
-		}
-	}
-	return FBuildingItemInfo();
-}
-
 bool APickupableItem::PickupSpecificItem(AActor* interactor, FString ItemName, int& Left)
 {
 	if (interactor->Implements<UManagmentInterface>() || (Cast<IManagmentInterface>(interactor) != nullptr))
 	{
-		if (StoredItems.Num() > 0)
+		if (Inventory->StoredItems.Num() > 0)
 		{
-			for (int i = 0; i < StoredItems.Num(); i++)
+			for (int i = 0; i < Inventory->StoredItems.Num(); i++)
 			{
-				if (StoredItems[i].Name == ItemName)
+				if (Inventory->StoredItems[i].Name == ItemName)
 				{
-					return IManagmentInterface::Execute_GiveItem(interactor, StoredItems[i], Left);
+					return IManagmentInterface::Execute_GiveItem(interactor, Inventory->StoredItems[i], Left);
 				}
 			}
 		}
@@ -204,7 +150,7 @@ void APickupableItem::OnFinishedGivingItems_Implementation(bool AllItemsWereGive
 {
 	if (!AllItemsWereGiven)
 	{
-		RemoveSomeItems(NotGivenItems);
+		Inventory->RemoveSomeItems(NotGivenItems);
 	}
 	else
 	{
