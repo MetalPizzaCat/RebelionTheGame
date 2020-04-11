@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Engine/DataTable.h"
+#include "PropHunt/Weapon/WeaponBase.h"
 #include "PropHunt/Items/ItemActionObjectBase.h"
 #include "ItemInfo.generated.h"
 
@@ -32,7 +33,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Action)
 		TSubclassOf<UItemActionObjectBase> ItemAction;
-	
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Ammo)
+		TMap<EAmmoType, int>Ammo;
 
 	FBuildingItemInfo() {}
 
@@ -43,4 +46,13 @@ public:
 	FBuildingItemInfo(FString _Name, int _Amount, FText _Description, bool _bIsKey, int _KeyId) :Name(_Name), Amount(_Amount), Description(_Description), bIsKey(_bIsKey), KeyId(_KeyId){}
 
 	FBuildingItemInfo(FString _Name, int _Amount, bool _bIsKey, int _KeyId) :Name(_Name), Amount(_Amount), bIsKey(_bIsKey), KeyId(_KeyId) {}
+
+
+	FBuildingItemInfo(FString _Name, int _Amount, FText _Description, TMap<EAmmoType, int>_Ammo) :Name(_Name), Amount(_Amount), Description(_Description),Ammo(_Ammo) {}
+
+	FBuildingItemInfo(FString _Name, int _Amount, TMap<EAmmoType, int>_Ammo) :Name(_Name), Amount(_Amount), Ammo(_Ammo) {}
+
+	FBuildingItemInfo(FString _Name, int _Amount, FText _Description, bool _bIsKey, int _KeyId, TMap<EAmmoType, int>_Ammo) :Name(_Name), Amount(_Amount), Description(_Description), bIsKey(_bIsKey), KeyId(_KeyId), Ammo(_Ammo) {}
+
+	FBuildingItemInfo(FString _Name, int _Amount, bool _bIsKey, int _KeyId, TMap<EAmmoType, int>_Ammo) :Name(_Name), Amount(_Amount), bIsKey(_bIsKey), KeyId(_KeyId), Ammo(_Ammo) {}
 };
