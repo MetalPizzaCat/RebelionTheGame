@@ -167,6 +167,10 @@ void APickupableItem::OnNothingLeft_Implementation(AActor* interactor)
 			IManagmentInterface::Execute_RequestHideContainerDisplay(interactor);
 		}
 	}
-	Destroy();
+	if (bDestroyIfEmpty) 
+	{
+		Destroy();
+	}
+
 }
 

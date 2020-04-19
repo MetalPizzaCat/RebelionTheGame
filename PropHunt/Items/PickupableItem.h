@@ -26,6 +26,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UInventoryComponent* Inventory;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool bDestroyIfEmpty = false;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
