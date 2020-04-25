@@ -6,6 +6,16 @@
 #include "GameFramework/Character.h"
 #include "AICharacterBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EAIState : uint8
+{
+	EAIS_Neutral		UMETA(DisplayName = "Neutral"),
+	EAIS_Angry		UMETA(DisplayName = "Angry"),
+	EAIS_Panick			UMETA(DisplayName = "Panick"),
+
+	EAIS_Max			UMETA(Hidden)
+};
+
 UCLASS()
 class PROPHUNT_API AAICharacterBase : public ACharacter
 {
@@ -28,12 +38,30 @@ protected:
 
 	FTimerHandle impulseTimerHandle;
 
+	FTimerHandle StateUpdateTimerHandle;
+
 public:	
 
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Health = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = AiState, META=(ExposeOnSpawn = "true"))
+		EAIState AiState = EAIState::EAIS_Neutral;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AiState)
+		bool bShouldAiStateBeUpdated = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AiState)
+		float TimeOfStateUpdate = 0.01f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
+		float DefaultMovementSpeed = 120.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
+		float DefaultRunningSpeed = 600.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bDead = false;
@@ -55,6 +83,17 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void PlayDeathSound();
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void UpdateAiState();
+
+	void UpdateAiState_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void CalculateAiState();
+
+	void CalculateAiState_Implementation();
 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

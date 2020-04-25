@@ -19,6 +19,13 @@ void AAICharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (bShouldAiStateBeUpdated)
+	{
+		if (GetWorld() != nullptr)
+		{
+			GetWorld()->GetTimerManager().SetTimer(StateUpdateTimerHandle,this,&AAICharacterBase::UpdateAiState ,TimeOfStateUpdate, true);
+		}
+	}
 }
 
 void AAICharacterBase::PlayDamageSound()
@@ -35,6 +42,35 @@ void AAICharacterBase::PlayDeathSound()
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation(), GetActorRotation());
 	}
+}
+
+void AAICharacterBase::UpdateAiState_Implementation()
+{
+	CalculateAiState();
+	//here you set current speed, voice lines etc. based on current state
+
+	//everything here is place holdewr
+	if (AiState == EAIState::EAIS_Neutral) 
+	{
+		GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSpeed;
+	}
+	else if (AiState == EAIState::EAIS_Panick)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = DefaultRunningSpeed;
+	}
+	else if (AiState == EAIState::EAIS_Angry)
+	{
+
+	}
+	else 
+	{
+		//Index out of range expection handling
+	}
+}
+
+void AAICharacterBase::CalculateAiState_Implementation()
+{
+	//here is where you write code that defines current state
 }
 
 float AAICharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
