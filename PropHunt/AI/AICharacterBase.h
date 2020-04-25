@@ -25,6 +25,7 @@ protected:
 
 	void ApplyImpulseToBody();
 
+
 	FTimerHandle impulseTimerHandle;
 
 public:	
@@ -47,6 +48,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		/*for the animation*/
 		bool bHurtAnimPlaying = false;
+
+
+	UFUNCTION(BlueprintCallable)
+	void PlayDamageSound();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayDeathSound();
 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
