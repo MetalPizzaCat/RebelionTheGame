@@ -19,6 +19,58 @@ void AAICharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (bShouldAiStateBeUpdated)
+	{
+		if (GetWorld() != nullptr)
+		{
+			GetWorld()->GetTimerManager().SetTimer(StateUpdateTimerHandle,this,&AAICharacterBase::UpdateAiState ,TimeOfStateUpdate, true);
+		}
+	}
+}
+
+void AAICharacterBase::PlayDamageSound()
+{
+	if (HurtSound != nullptr&& GetWorld()!=nullptr&&!bDead)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HurtSound, GetActorLocation(), GetActorRotation());
+	}
+}
+
+void AAICharacterBase::PlayDeathSound()
+{
+	if (DeathSound != nullptr && GetWorld() != nullptr && !bDead)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation(), GetActorRotation());
+	}
+}
+
+void AAICharacterBase::UpdateAiState_Implementation()
+{
+	CalculateAiState();
+	//here you set current speed, voice lines etc. based on current state
+
+	//everything here is place holdewr
+	if (AiState == EAIState::EAIS_Neutral) 
+	{
+		GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSpeed;
+	}
+	else if (AiState == EAIState::EAIS_Panick)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = DefaultRunningSpeed;
+	}
+	else if (AiState == EAIState::EAIS_Angry)
+	{
+
+	}
+	else 
+	{
+		//Index out of range expection handling
+	}
+}
+
+void AAICharacterBase::CalculateAiState_Implementation()
+{
+	//here is where you write code that defines current state
 }
 
 float AAICharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -39,6 +91,10 @@ float AAICharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		if (Health <= 0.f)
 		{
 			Die();
+		}
+		else
+		{
+			PlayDamageSound();
 		}
 	}
 	else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID)) 
@@ -62,10 +118,14 @@ float AAICharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 			GetWorld()->GetTimerManager().SetTimer(impulseTimerHandle, this, &AAICharacterBase::ApplyImpulseToBody, 0.01f, false);
 			Die();
 		}
+		else
+		{
+			PlayDamageSound();
+		}
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("damage!"));
+		
 	}
 
 	
@@ -82,6 +142,7 @@ void AAICharacterBase::Die_Implementation()
 	 {
 		 GetController()->UnPossess();
 	 }
+	 PlayDeathSound();
 }
 
 void AAICharacterBase::ApplyImpulseToBody()
