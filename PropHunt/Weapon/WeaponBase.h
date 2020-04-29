@@ -133,6 +133,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		float SpreadIncrement = 0.45f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Aiming, Replicated)
+		bool bAiming = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		float AimOffset = 1.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Ammo)
 		EAmmoType AmmoType = EAmmoType::EAT_Rifle;
 
