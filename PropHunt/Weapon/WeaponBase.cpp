@@ -71,7 +71,7 @@ bool AWeaponBase::PrimaryFire_Implementation(FVector location, FRotator rotation
 			{
 				FRandomStream randomStream = FRandomStream(FMath::Rand());
 
-				FVector ShootDir = randomStream.VRandCone(rotation.Vector(), FMath::DegreesToRadians(DefaultFiringSpread) * 0.5f, FMath::DegreesToRadians(DefaultFiringSpread) * 0.5f);
+				FVector ShootDir = randomStream.VRandCone(rotation.Vector(), FMath::DegreesToRadians(bAiming?DefaultFiringSpread/2: DefaultFiringSpread) * 0.5f, FMath::DegreesToRadians(bAiming ? DefaultFiringSpread / 2 : DefaultFiringSpread) * 0.5f);
 				if (GetLocalRole() < ENetRole::ROLE_Authority)
 				{
 					SpawnBulletNotServer(location, ShootDir.Rotation());
@@ -259,5 +259,7 @@ void AWeaponBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLif
 	DOREPLIFETIME(AWeaponBase, PrimaryOutOfAmmoSound);
 
 	DOREPLIFETIME(AWeaponBase, PrimaryDamage);
+
+	DOREPLIFETIME(AWeaponBase, bAiming);
 }
 
