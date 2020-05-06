@@ -52,7 +52,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void SpawnBulletNotServer(FVector location, FRotator rotation);
+	bool SpawnBulletNotServer(FVector location, FRotator rotation);
 public:	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
@@ -81,6 +81,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		TSubclassOf<APropHuntProjectile>PrimaryProjectileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DisplayName)
+		FText Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		TSubclassOf<APropHuntProjectile>SecondaryProjectileClass;
@@ -137,7 +140,13 @@ public:
 		bool bAiming = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
-		float AimOffset = 1.f;
+		FVector AimLocationOffset = FVector(5.f, 0.f, -3.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		FRotator AimOffset = FRotator(0.f, 0.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		FRotator AimRotation = FRotator(0.f, -91.f, 0.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Ammo)
 		EAmmoType AmmoType = EAmmoType::EAT_Rifle;

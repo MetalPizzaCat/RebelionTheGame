@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine.h"
 
+
+
 // Sets default values
 AWeaponBase::AWeaponBase()
 {
@@ -41,18 +43,21 @@ void AWeaponBase::BeginPlay()
 	
 }
 
-void AWeaponBase::SpawnBulletNotServer(FVector location, FRotator rotation)
+bool AWeaponBase::SpawnBulletNotServer(FVector location, FRotator rotation)
 {
 	if (WeaponOwner != nullptr)
 	{
 		//PrimaryFire(location, rotation);
 		//if (WeaponOwner->Implements<UWeaponInterface>() || (Cast<IWeaponInterface>(WeaponOwner) != nullptr)) { IWeaponInterface::Execute_RequestSpawnProjectile(WeaponOwner, PrimaryProjectileClass, location, rotation); }
 		auto bullet = GetWorld()->SpawnActor<APropHuntProjectile>(PrimaryProjectileClass, location, rotation);
+		if (bullet == nullptr) { return false; }
 		bullet->Damage = PrimaryDamage;
 		bullet->SetOwner(WeaponOwner);
 		bullet->StartLocation = location;
 		bullet->GetCollisionComp()->IgnoreActorWhenMoving(WeaponOwner, true);
+		return true;
 	}
+	return false;
 }
 
 bool AWeaponBase::PrimaryFire_Implementation(FVector location, FRotator rotation)
@@ -72,6 +77,7 @@ bool AWeaponBase::PrimaryFire_Implementation(FVector location, FRotator rotation
 				FRandomStream randomStream = FRandomStream(FMath::Rand());
 
 				FVector ShootDir = randomStream.VRandCone(rotation.Vector(), FMath::DegreesToRadians(bAiming?DefaultFiringSpread/2: DefaultFiringSpread) * 0.5f, FMath::DegreesToRadians(bAiming ? DefaultFiringSpread / 2 : DefaultFiringSpread) * 0.5f);
+#ifdef ONLINE_BASE_CODE
 				if (GetLocalRole() < ENetRole::ROLE_Authority)
 				{
 					SpawnBulletNotServer(location, ShootDir.Rotation());
@@ -81,15 +87,22 @@ bool AWeaponBase::PrimaryFire_Implementation(FVector location, FRotator rotation
 					
 					ServerPrimaryFire(location, ShootDir.Rotation());
 				}
+#else
+				if (SpawnBulletNotServer(location, ShootDir.Rotation()))
+				{
+					PrimaryFireEffects(location, rotation);
+					AmmoInTheClip -= 1;
+					if (AmmoInTheClip < 0) { AmmoInTheClip = 0; }
+					bCanShoot = false;
+					GetWorld()->GetTimerManager().SetTimer(CooldownTimerHadle, this, &AWeaponBase::EndCooldown, WeaponCooldown);
+					return true;
+				}
+				else { return false; }
+#endif
 				
 				
 				
-				PrimaryFireEffects(location, rotation);
-				AmmoInTheClip -= 1;
-				if (AmmoInTheClip < 0) { AmmoInTheClip = 0; }
-				bCanShoot = false;
-				GetWorld()->GetTimerManager().SetTimer(CooldownTimerHadle, this, &AWeaponBase::EndCooldown, WeaponCooldown);
-				return true;
+				
 			}
 			else
 			{
