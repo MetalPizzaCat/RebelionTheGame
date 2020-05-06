@@ -55,6 +55,9 @@ protected:
 	bool SpawnBulletNotServer(FVector location, FRotator rotation);
 public:	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HandOffset)
+		FVector LeftHandOffset = FVector(0, 0, 0);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		FTimerHandle CooldownTimerHadle;
 
