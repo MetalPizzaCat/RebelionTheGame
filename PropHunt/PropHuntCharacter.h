@@ -172,6 +172,19 @@ public:
 
 	bool CanSprint_Implementation();
 
+	/*Returns true if visibility was changed and false otherwise*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool RequestUIVisibility(bool Visibility);
+
+	bool RequestUIVisibility_Implementation(bool Visibility);
+
+	/*Mesh that is used to check if player is visible*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category=AIVisibility)
+		/*Mesh that is used to check if player is visible*/
+		USkeletalMeshComponent* GetBodyMesh();
+
+	USkeletalMeshComponent* GetBodyMesh_Implementation() { return GetMesh(); }
+
 
 	UFUNCTION(BlueprintCallable)
 		void UpdateAirInfo();

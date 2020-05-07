@@ -253,6 +253,23 @@ bool APropHuntCharacter::CanSprint_Implementation()
 	return (bAllowedToSprint && !bIsCrouched && CurrentSprintingTime <= (MaxSprintTime - MaxSprintTime * 0.2));
 }
 
+bool APropHuntCharacter::RequestUIVisibility_Implementation(bool Visibility)
+{
+	if (GetController() != nullptr)
+	{
+		auto PC = Cast<APlayerController>(GetController());
+		if (PC != nullptr)
+		{
+			if (PC->GetHUD() != nullptr)
+			{
+				PC->GetHUD()->SetHidden(!Visibility);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 void APropHuntCharacter::UpdateAirInfo()
 {
 	float dt = 0.01f;
