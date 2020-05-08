@@ -55,6 +55,8 @@ protected:
 	bool SpawnBulletNotServer(FVector location, FRotator rotation);
 public:	
 
+	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HandOffset)
 		FVector LeftHandOffset = FVector(0, 0, 0);
 
@@ -143,7 +145,19 @@ public:
 		bool bAiming = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		float AimFOVOffset = 60.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
 		FVector AimLocationOffset = FVector(5.f, 0.f, -3.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		FVector HandMeshLocationOffset = FVector(0,0, -5.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		bool bOffsetHandMesh = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		FRotator DefaultShootingOffset =FRotator(0.f, -2.f, 0.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
 		FRotator AimOffset = FRotator(0.f, 0.f, 0.f);
