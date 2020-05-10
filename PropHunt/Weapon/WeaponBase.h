@@ -111,10 +111,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		USoundBase* ReloadSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, SaveGame)
 		AActor* WeaponOwner;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, SaveGame)
 		int AmmoInTheClip = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
@@ -126,13 +126,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Replicated)
 		bool bSecondaryFireIsAim = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, SaveGame)
 		bool bCanShoot = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		float PrimaryDamage = 10.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, SaveGame)
 		float CurrentFiringSpread = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
@@ -141,7 +141,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		float SpreadIncrement = 0.45f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Aiming, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Aiming, Replicated, SaveGame)
 		bool bAiming = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
@@ -171,10 +171,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		bool bCanBePickedUp = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, SaveGame)
 		float AIDamageModifier = 0.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, SaveGame)
 		bool bHolstered = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
