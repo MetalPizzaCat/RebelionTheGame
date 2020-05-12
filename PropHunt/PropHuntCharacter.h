@@ -65,22 +65,22 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Mesh)
 		class USkeletalMeshComponent* FP_Gun;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		float Health = 100.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		bool bAllowedToSprint = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=PickingUp)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=PickingUp, SaveGame)
 		bool bAllowedToPickUp = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Sprinting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Sprinting, SaveGame)
 		bool bIsSprinting = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting, SaveGame)
 		float SprintingSpeed = 900.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting, SaveGame)
 		bool bSprintKeyDown = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -89,7 +89,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
 		float MaxSprintTime = 10.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		float TimeInAir = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
@@ -98,19 +98,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
 		float FallDamageMultiplier = 5.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		bool bFallDamage = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		FTimerHandle FallingInfoUpdateTimer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
 		USoundBase* FallingDamageSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting, SaveGame)
 		FTimerHandle SprintUpdateTimer;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting, SaveGame)
 		float CurrentSprintingTime = 0.f;
 
 	/** Location on gun mesh where projectiles should spawn. */
