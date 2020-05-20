@@ -6,7 +6,9 @@
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
 #include "Perception/AISightTargetInterface.h"
+#include "FootstepInterface.h"
 #include "PropHuntCharacter.generated.h"
+
 
 class UInputComponent;
 
@@ -15,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSprinting);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopSprinting);
 
 UCLASS(config=Game)
-class APropHuntCharacter : public ACharacter, public IAISightTargetInterface
+class APropHuntCharacter : public ACharacter, public IAISightTargetInterface,public IFootstepInterface
 {
 	GENERATED_BODY()
 
@@ -23,15 +25,17 @@ class APropHuntCharacter : public ACharacter, public IAISightTargetInterface
 
 public:
 	APropHuntCharacter();
+	APropHuntCharacter(const FObjectInitializer& ObjectInitializer);
+
 
 protected:
 	virtual void BeginPlay();
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	void StartCrouching() { Crouch(); UpdateMeshPositionOnCrouch(true); }
+	void StartCrouching();
 
-	void StopCrouching() { UnCrouch(); UpdateMeshPositionOnCrouch(false);}
+	void StopCrouching() { if (bHoldCrouch) { UnCrouch(); UpdateMeshPositionOnCrouch(false); } }
 
 	void StartSprinting();
 
@@ -44,12 +48,16 @@ protected:
 	void OnSprintButtonUp() { if (bSprintKeyDown) { bSprintKeyDown = false; StopSprinting(); } }
 
 public:
+	UPROPERTY(BlueprintReadOnly,VisibleAnywhere,Category=Components)
+		UFootstepComponent* FootstepComponent;
 
 	UPROPERTY(BlueprintAssignable)
 		FOnStartSprinting OnStartSprinting;
 
 	UPROPERTY(BlueprintAssignable)
 		FOnStopSprinting OnStopSprinting;
+
+	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Sprinting)
 		void OnStartedSprinting();
@@ -60,6 +68,13 @@ public:
 		void OnStopedSprinting();
 
 	void OnStopedSprinting_Implementation() {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Crouching, SaveGame)
+		bool bHoldCrouch = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Crouching, SaveGame)
+		bool bIsCurrentlyCrouched = false;
+
 
 	/** Gun mesh: 1st person view (seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Mesh)
@@ -162,6 +177,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
 		TSubclassOf<UCameraShake> CameraShakeLandingWeakClass;
 
+
+
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void UpdateMeshPositionOnCrouch(bool isCrouching);
 
@@ -235,6 +253,11 @@ public:
 		float& OutSightStrength,
 		const AActor* IgnoreActor = NULL
 	) const;
+
+	virtual UFootstepComponent* GetFootstepComponent_Implementation() const override 
+	{
+		return FootstepComponent;
+	}
 
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }

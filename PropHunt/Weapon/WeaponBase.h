@@ -17,7 +17,8 @@ enum class EAmmoType : uint8
 {
 	EAT_Rifle 	UMETA(DisplayName = "Rifle"),
 	EAT_Shotgun 	UMETA(DisplayName = "Shotgun"),
-	EAT_Pistol 	UMETA(DisplayName = "Pistol")
+	EAT_Pistol 	UMETA(DisplayName = "Pistol"),
+	EAT_Grenade 	UMETA(DisplayName = "Grenade"),
 };
 
 UENUM(BlueprintType)		//What ammo weapon needs

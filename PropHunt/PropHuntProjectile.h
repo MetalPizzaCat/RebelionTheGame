@@ -10,7 +10,7 @@ UCLASS(config=Game)
 class APropHuntProjectile : public AActor
 {
 	GENERATED_BODY()
-
+public:
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	class USphereComponent* CollisionComp;
@@ -20,7 +20,7 @@ class APropHuntProjectile : public AActor
 	class UProjectileMovementComponent* ProjectileMovement;
 
 
-public:
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Damage = 10.f;
