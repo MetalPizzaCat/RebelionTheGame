@@ -21,6 +21,10 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UBillboardComponent* EditorBillboard;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<AAINodeBase*> Nodes;
 

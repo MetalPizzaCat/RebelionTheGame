@@ -7,7 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine.h"
 
-
+//#define ONLINE_BASE_CODE
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -80,12 +80,27 @@ bool AWeaponBase::PrimaryFire_Implementation(FVector location, FRotator rotation
 #ifdef ONLINE_BASE_CODE
 				if (GetLocalRole() < ENetRole::ROLE_Authority)
 				{
-					SpawnBulletNotServer(location, ShootDir.Rotation());
+					if (SpawnBulletNotServer(location, ShootDir.Rotation()))
+					{
+						PrimaryFireEffects(location, rotation);
+						AmmoInTheClip -= 1;
+						if (AmmoInTheClip < 0) { AmmoInTheClip = 0; }
+						bCanShoot = false;
+						GetWorld()->GetTimerManager().SetTimer(CooldownTimerHadle, this, &AWeaponBase::EndCooldown, WeaponCooldown);
+						return true;
+					}
+					else { return false; }
 				}
 				else
 				{
 					
 					ServerPrimaryFire(location, ShootDir.Rotation());
+					PrimaryFireEffects(location, rotation);
+					AmmoInTheClip -= 1;
+					if (AmmoInTheClip < 0) { AmmoInTheClip = 0; }
+					bCanShoot = false;
+					GetWorld()->GetTimerManager().SetTimer(CooldownTimerHadle, this, &AWeaponBase::EndCooldown, WeaponCooldown);
+					return true;
 				}
 #else
 				if (SpawnBulletNotServer(location, ShootDir.Rotation()))

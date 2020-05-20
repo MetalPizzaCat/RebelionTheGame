@@ -13,6 +13,7 @@
 #include "Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
+#include "FootstepComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -70,6 +71,52 @@ APropHuntCharacter::APropHuntCharacter()
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
 }
 
+APropHuntCharacter::APropHuntCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	
+
+	// Set size for collision capsule
+	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+
+	// set our turn rates for input
+	BaseTurnRate = 45.f;
+	BaseLookUpRate = 45.f;
+
+	// Create a CameraComponent	
+	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f)); // Position the camera
+	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+
+
+	PlayerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PlayerMesh"));
+	PlayerMesh->SetRelativeRotation(FRotator(0.f, 0.f, -90.f));
+	PlayerMesh->SetRelativeLocation(FVector(0.f, 0.f, -95.f));
+	PlayerMesh->SetOnlyOwnerSee(true);
+	PlayerMesh->HideBoneByName(HeadBoneName, EPhysBodyOp::PBO_None);
+
+	// Create a gun mesh component
+	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
+	FP_Gun->bCastDynamicShadow = true;
+	FP_Gun->CastShadow = true;
+	// FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
+	FP_Gun->SetupAttachment(RootComponent);
+
+	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
+	FP_MuzzleLocation->SetupAttachment(FP_Gun);
+	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+
+	// Default offset from the character location for projectiles to spawn
+	GunOffset = FVector(100.0f, 0.0f, 10.0f);
+
+#ifndef USEDEFAULTMESHSYSTEM
+	PlayerMesh->SetupAttachment(FirstPersonCameraComponent);
+#endif // !USEDEFAULTMESHSYSTEM
+
+	FootstepComponent = ObjectInitializer.CreateDefaultSubobject<UFootstepComponent>(this, TEXT("FootstepComponent"));
+
+}
+
 void APropHuntCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -85,6 +132,30 @@ void APropHuntCharacter::BeginPlay()
 
 void APropHuntCharacter::OnConstruction(const FTransform& Transform)
 {
+}
+
+void APropHuntCharacter::StartCrouching()
+{
+	if (bHoldCrouch)
+	{
+		Crouch(); 
+		UpdateMeshPositionOnCrouch(true);
+	}
+	else
+	{
+		if (!bIsCurrentlyCrouched && CanCrouch())
+		{
+			Crouch();
+			UpdateMeshPositionOnCrouch(true);
+			bIsCurrentlyCrouched = true;
+		}
+		else if (bIsCurrentlyCrouched)
+		{
+			UnCrouch(); 
+			UpdateMeshPositionOnCrouch(false);
+			bIsCurrentlyCrouched = false;
+		}
+	}
 }
 
 void APropHuntCharacter::StartSprinting()
