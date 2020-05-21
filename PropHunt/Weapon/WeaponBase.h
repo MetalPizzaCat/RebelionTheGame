@@ -164,6 +164,12 @@ public:
 		FRotator AimOffset = FRotator(0.f, 0.f, 0.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		FRotator DefaultCrouchedShootingOffset = FRotator(0.f, -2.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
+		FRotator CrouchedAimOffset = FRotator(0.f, 0.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Aiming)
 		FRotator AimRotation = FRotator(0.f, -91.f, 0.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Ammo)
