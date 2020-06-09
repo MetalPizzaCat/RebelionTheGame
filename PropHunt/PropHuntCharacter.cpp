@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "Engine.h"
+#include "PropHunt/Water/WaterBody.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include "FootstepComponent.h"
@@ -220,6 +221,20 @@ void APropHuntCharacter::SprintUpdate()
 	
 }
 
+bool APropHuntCharacter::IsInWater()
+{
+	TSet<AActor*>WaterBodies;
+	GetCapsuleComponent()->GetOverlappingActors(WaterBodies, AWaterBody::StaticClass());
+	if (WaterBodies.Num() > 0)
+	{
+		for (int i = 0; i < WaterBodies.Num(); i++)
+		{
+			if (Cast< AWaterBody>(WaterBodies.Array()[i])->IsCharacterInWater()) { return true; }
+		}
+	}
+	return false;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -266,14 +281,31 @@ bool APropHuntCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector&
 
 	FHitResult HitResult;
 
-	auto sockets = GetMesh()->GetAllSocketNames();
+	TArray<FName> sockets;
+	if (GetBodyMesh() != nullptr)
+	{
+		sockets = GetBodyMesh()->GetAllSocketNames();
+	}
+	else
+	{
+		sockets = GetMesh()->GetAllSocketNames();
+	}
 
 	FCollisionQueryParams params = FCollisionQueryParams();
 	params.AddIgnoredActor(IgnoreActor);
 
 	for (int i = 0; i < sockets.Num(); i++)
 	{
-		FVector socketLocation = GetMesh()->GetSocketLocation(sockets[i]);
+		FVector socketLocation;
+		
+		if (GetBodyMesh() != nullptr)
+		{
+			socketLocation = GetBodyMesh()->GetSocketLocation(sockets[i]);
+		}
+		else
+		{
+			socketLocation = GetMesh()->GetSocketLocation(sockets[i]);
+		}
 
 #ifdef PERCEPTION_TEST
 		const bool bHitSocket = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, socketLocation
@@ -363,7 +395,7 @@ void APropHuntCharacter::Landed(const FHitResult& Hit)
 		if (TimeInAir <= MinTimeInAirToDealDamage * 1.5f) { FallDamageModifier = 0.3f; }
 		else if(TimeInAir <= MinTimeInAirToDealDamage * 2.f) { FallDamageModifier = 0.5f; }
 		
-		float Damage = TimeInAir * FallDamageMultiplier* FallDamageModifier;
+		float Damage = TimeInAir * IsInWater() ? WaterFallDamageMultiplier : FallDamageMultiplier * FallDamageModifier;
 		
 		Health -= Damage;
 
@@ -377,7 +409,7 @@ void APropHuntCharacter::Landed(const FHitResult& Hit)
 		}
 		if (FallingDamageSound != nullptr)
 		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), FallingDamageSound, GetActorLocation());
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), IsInWater() ? FallInWaterSound : FallingDamageSound, GetActorLocation());
 		}
 		
 		TimeInAir = 0.f;
