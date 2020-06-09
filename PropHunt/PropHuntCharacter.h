@@ -57,7 +57,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 		FOnStopSprinting OnStopSprinting;
 
-	
+	UFUNCTION(BlueprintPure, Category = Water)
+		bool IsInWater();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Sprinting)
 		void OnStartedSprinting();
@@ -68,6 +69,8 @@ public:
 		void OnStopedSprinting();
 
 	void OnStopedSprinting_Implementation() {}
+
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Crouching, SaveGame)
 		bool bHoldCrouch = false;
@@ -107,11 +110,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		float TimeInAir = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		float MinTimeInAirToDealDamage = 15.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		float FallDamageMultiplier = 5.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FallDamage, SaveGame)
+		float WaterFallDamageMultiplier = 2.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		bool bFallDamage = false;
@@ -119,8 +125,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		FTimerHandle FallingInfoUpdateTimer;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
 		USoundBase* FallingDamageSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Falling, SaveGame)
+		USoundBase* FallInWaterSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sprinting, SaveGame)
 		FTimerHandle SprintUpdateTimer;
@@ -199,9 +208,9 @@ public:
 	/*Mesh that is used to check if player is visible*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category=AIVisibility)
 		/*Mesh that is used to check if player is visible*/
-		USkeletalMeshComponent* GetBodyMesh();
+		USkeletalMeshComponent* GetBodyMesh()const;
 
-	USkeletalMeshComponent* GetBodyMesh_Implementation() { return GetMesh(); }
+	USkeletalMeshComponent* GetBodyMesh_Implementation()const { return GetMesh(); }
 
 
 	UFUNCTION(BlueprintCallable)
