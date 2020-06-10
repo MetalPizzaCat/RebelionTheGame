@@ -8,6 +8,8 @@
 #include "Components/AudioComponent.h"
 #include "PropBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartedSimulatingPhysicsDelegate);
+
 UCLASS()
 /*DO NOT USE THIS CLASS. USE ONLY IT'S CHILDREN*/
 class PROPHUNT_API APropBase : public AActor
@@ -23,6 +25,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	UPROPERTY(BlueprintAssignable)
+		FStartedSimulatingPhysicsDelegate OnStartedSimulatingPhysicsDelegate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), SaveGame)
 		UStaticMeshComponent* Mesh=nullptr;
@@ -43,13 +47,27 @@ public:
 
 	virtual bool IsTouchingAnything_Implementation();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Water)
 		bool IsInTheWater();
 
 	virtual bool IsInTheWater_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Water)
+		void WaterImpact();
+
+	virtual void WaterImpact_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category=Water)
+		void OnLeftWater();
+
+	virtual void OnLeftWater_Implementation();
+
+
 	UFUNCTION(BlueprintCallable)
 		void OnPropHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION(BlueprintCallable)
+		void StartSimulatingPhysics();
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
@@ -59,10 +77,16 @@ public:
 		float MinImpulse = 8000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Impulse, meta = (ExposeOnSpawn = "true"), SaveGame)
-		float MinImpulseToScrape = 10.f;
+		float MinImpulseToScrape = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Water, meta = (ExposeOnSpawn = "true"), SaveGame)
 		float Bouyancy = 400.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Water, meta = (ExposeOnSpawn = "true"), SaveGame)
+		float WaterImpactSize = 25.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Water, meta = (ExposeOnSpawn = "true"), SaveGame)
+		float DefaultWaterImpactPower = 25.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sound, meta = (ExposeOnSpawn = "true"), SaveGame)
 		USoundBase* HitSound;
@@ -70,9 +94,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Sound, meta = (ExposeOnSpawn = "true"), SaveGame)
 		USoundBase* SplashSound;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sound, meta = (ExposeOnSpawn = "true"), SaveGame)
 		USoundAttenuation* SoundAttenuation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawn, meta = (ExposeOnSpawn = "true"), SaveGame)
+		bool bSimulatePhysics = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sound, meta = (ExposeOnSpawn = "true"), SaveGame)
+		USoundBase* StartSimulatePhysicsSound;
+
+
 
 	/*Smaller this value better the performance, but worse sound system*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)

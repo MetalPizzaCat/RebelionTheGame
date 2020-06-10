@@ -15,7 +15,7 @@ APropBase::APropBase()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	//SetRootComponent(WeaponMesh);
-	Mesh->SetSimulatePhysics(true);
+	
 	RootComponent = Mesh;
 
 	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
@@ -41,6 +41,71 @@ void APropBase::BeginPlay()
 
 void APropBase::Update_Implementation()
 {
+	if (ScrapeSound != nullptr)
+	{
+		if (IsTouchingAnything())
+		{
+			if (IsInTheWater() && !bIsInTheWater)
+			{
+				//we touch water for the first time
+				bIsInTheWater = true;
+				WaterImpact();
+				if (SplashSound != nullptr)
+				{
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), SplashSound, ScrapeSound->GetComponentLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
+				}
+			}
+			else if (!IsInTheWater() && bIsInTheWater)
+			{
+				//first moment of leaving water
+				bIsInTheWater = false;
+				OnLeftWater();
+				if (SplashSound != nullptr)
+				{
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), SplashSound, ScrapeSound->GetComponentLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
+				}
+			}
+			if (GetVelocity().Size() >= MinImpulseToScrape)
+			{
+				if (ScrapeSound->GetPlayState() == EAudioComponentPlayState::Stopped)
+				{
+					ScrapeSound->Play();
+				}
+				else if (ScrapeSound->GetPlayState() == EAudioComponentPlayState::Paused)
+				{
+					ScrapeSound->SetPaused(false);
+				}
+			}
+			else
+			{
+				ScrapeSound->SetPaused(true);
+			}
+		}
+		else if (IsInTheWater() && !bIsInTheWater)
+		{
+			//we touch water for the first time
+			bIsInTheWater = true;
+			WaterImpact();
+			if (SplashSound != nullptr)
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), SplashSound, ScrapeSound->GetComponentLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
+			}
+		}
+		else if (!IsInTheWater() && bIsInTheWater)
+		{
+			//first moment of leaving water
+			bIsInTheWater = false;
+			OnLeftWater();
+			if (SplashSound != nullptr)
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), SplashSound, ScrapeSound->GetComponentLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
+			}
+		}
+		else
+		{
+			ScrapeSound->SetPaused(true);
+		}
+	}
 }
 
 bool APropBase::IsTouchingAnything_Implementation()
@@ -79,6 +144,14 @@ bool APropBase::IsInTheWater_Implementation()
 	return false;
 }
 
+void APropBase::WaterImpact_Implementation()
+{
+}
+
+void APropBase::OnLeftWater_Implementation()
+{
+}
+
 void APropBase::OnPropHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if ( HitSound != nullptr && NormalImpulse.Size() >= MinImpulse)
@@ -87,74 +160,23 @@ void APropBase::OnPropHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	}
 }
 
+void APropBase::StartSimulatingPhysics()
+{
+	OnStartedSimulatingPhysicsDelegate.Broadcast();
+	Mesh->SetSimulatePhysics(true);
+
+}
+
 // Called every frame
 void APropBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (ScrapeSound != nullptr)
-	{
-		if (IsTouchingAnything() )
-		{
-			if (IsInTheWater() && !bIsInTheWater)
-			{
-				//we touch water for the first time
-				bIsInTheWater = true;
-
-				if (SplashSound != nullptr)
-				{
-					UGameplayStatics::PlaySoundAtLocation(GetWorld(), SplashSound, GetActorLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
-				}
-			}
-			else if (!IsInTheWater() && bIsInTheWater)
-			{
-				//first moment of leaving water
-				bIsInTheWater = false;
-
-				if (SplashSound != nullptr)
-				{
-					UGameplayStatics::PlaySoundAtLocation(GetWorld(), SplashSound, GetActorLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
-				}
-			}
-
-			if (ScrapeSound->GetPlayState() == EAudioComponentPlayState::Stopped)
-			{
-				ScrapeSound->Play();
-			}
-			else if (ScrapeSound->GetPlayState() == EAudioComponentPlayState::Paused)
-			{
-				ScrapeSound->SetPaused(false);
-			}
-		}
-		else if (IsInTheWater() && !bIsInTheWater)
-		{
-			//we touch water for the first time
-			bIsInTheWater = true;
-
-			if (SplashSound != nullptr)
-			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), SplashSound, GetActorLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
-			}
-		}
-		else if (!IsInTheWater() && bIsInTheWater)
-		{
-			//first moment of leaving water
-			bIsInTheWater = false;
-
-			if (SplashSound != nullptr)
-			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), SplashSound, GetActorLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
-			}
-		}
-		else
-		{
-			ScrapeSound->SetPaused(true);
-		}
-	}
+	
 }
 
 void APropBase::OnConstruction(const FTransform& Transform)
 {
-
+	Mesh->SetSimulatePhysics(bSimulatePhysics);
 }
 
