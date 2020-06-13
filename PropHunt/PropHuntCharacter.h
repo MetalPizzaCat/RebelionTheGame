@@ -9,7 +9,6 @@
 #include "FootstepInterface.h"
 #include "PropHuntCharacter.generated.h"
 
-
 class UInputComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSprinting);
@@ -48,6 +47,7 @@ protected:
 	void OnSprintButtonUp() { if (bSprintKeyDown) { bSprintKeyDown = false; StopSprinting(); } }
 
 public:
+
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere,Category=Components)
 		UFootstepComponent* FootstepComponent;
 
@@ -88,6 +88,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		bool bAllowedToSprint = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ladder, SaveGame)
+		bool bIsOnTheLadder = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ladder, SaveGame)
+		float LadderSpeedMultiplier = 3.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=PickingUp, SaveGame)
 		bool bAllowedToPickUp = false;
@@ -187,6 +193,15 @@ public:
 		TSubclassOf<UCameraShake> CameraShakeLandingWeakClass;
 
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void StartClimbingLadder();
+
+	void StartClimbingLadder_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void StopClimbingLadder();
+
+	void StopClimbingLadder_Implementation();
 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

@@ -351,6 +351,18 @@ bool APropHuntCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector&
 	return false;
 }
 
+void APropHuntCharacter::StartClimbingLadder_Implementation()
+{
+	bIsOnTheLadder = true;
+	Cast<UCharacterMovementComponent>(GetMovementComponent())->SetMovementMode(EMovementMode::MOVE_Flying);//set movement to Flying./*althought it looks weird, actual flying can be exucuted by checking if IsOnTheLAdder or something like that is false
+}
+
+void APropHuntCharacter::StopClimbingLadder_Implementation()
+{
+	bIsOnTheLadder = false;
+	Cast<UCharacterMovementComponent>(GetMovementComponent())->SetMovementMode(EMovementMode::MOVE_Walking);//set movement to walking
+}
+
 bool APropHuntCharacter::CanSprint_Implementation()
 {
 	return (bAllowedToSprint && !bIsCrouched && CurrentSprintingTime <= (MaxSprintTime - MaxSprintTime * 0.2));
@@ -464,8 +476,19 @@ void APropHuntCharacter::MoveForward(float Value)
 {
 	if (Value != 0.0f)
 	{
-		// add movement in that direction
-		AddMovementInput(GetActorForwardVector(), Value);
+		if (bIsOnTheLadder)
+		{
+			AddMovementInput(GetActorUpVector(), Value* LadderSpeedMultiplier);
+		}
+		else
+		{
+			// add movement in that direction
+			AddMovementInput(GetActorForwardVector(), Value);
+		}
+	}
+	else if (bIsOnTheLadder)
+	{
+		GetCharacterMovement()->StopMovementImmediately();
 	}
 }
 
@@ -476,6 +499,7 @@ void APropHuntCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), Value);
 	}
+	
 }
 
 void APropHuntCharacter::TurnAtRate(float Rate)
