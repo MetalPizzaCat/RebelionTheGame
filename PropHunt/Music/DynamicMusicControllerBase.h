@@ -32,6 +32,9 @@ public:
 	// Sets default values for this actor's properties
 	ADynamicMusicControllerBase();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UBillboardComponent* EditorBillboard;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), SaveGame)
 		UAudioComponent* Percussion_Loop = nullptr;
 
@@ -48,6 +51,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), SaveGame)
 		bool bSawPlayer = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), SaveGame)
+		bool bOnlyStopWhenEveryOneIsDead = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), SaveGame)
 		TArray<AActor*>SoldersToCareAbout;
@@ -89,5 +95,10 @@ public:
 		bool CanThisSolderSeePlayer(AActor*Solder);
 
 	bool CanThisSolderSeePlayer_Implementation(AActor* Solder) { return false; }
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		bool IsEveryoneDead();
+
+	bool IsEveryoneDead_Implementation() { return false; }
 
 };
