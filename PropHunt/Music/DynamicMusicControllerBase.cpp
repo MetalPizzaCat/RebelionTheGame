@@ -95,7 +95,7 @@ void ADynamicMusicControllerBase::Update()
 					else
 					{
 						Percussion_Loop->SetVolumeMultiplier(1.f);
-						Action_Loop->SetVolumeMultiplier(0.f);
+						Action_Loop->SetVolumeMultiplier(0.01f);
 					}				
 					SwitchToIdle();
 				}
@@ -149,9 +149,9 @@ void ADynamicMusicControllerBase::Update()
 				}
 				else
 				{
-					
-					Percussion_Loop->SetVolumeMultiplier(0.f);
 					Action_Loop->SetVolumeMultiplier(1.f);
+					Percussion_Loop->SetVolumeMultiplier(0.01f);
+					
 				}
 
 				SwitchingToIdleTimerHadnle.Invalidate();
@@ -162,6 +162,7 @@ void ADynamicMusicControllerBase::Update()
 
 void ADynamicMusicControllerBase::SwitchToPercussion()
 {
+	CalmingDownTimerHandle.Invalidate();
 	State = EMusicState::EMS_Percussion;
 	if (bUseSoundParametrs)
 	{
@@ -170,7 +171,7 @@ void ADynamicMusicControllerBase::SwitchToPercussion()
 	else
 	{
 		Percussion_Loop->SetVolumeMultiplier(1.f);
-		Action_Loop->SetVolumeMultiplier(0.f);
+		Action_Loop->SetVolumeMultiplier(0.01f);
 	}
 	if (!bOnlyStopWhenEveryOneIsDead)
 	{
