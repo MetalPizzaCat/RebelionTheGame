@@ -1,4 +1,4 @@
-# SimulationsTheGame
+# Rebelion
 Half life styled game beeing made in Unreal Engine 4, this repo contains **ONLY CODE** for project
 
 ## Note 
@@ -8,6 +8,7 @@ Originaly it was "Prop Hunt" remake in Unreal Engine 4, but as time went it turn
 This project needs
 * Artist(Person responsible for creating of models and/or animating
 * Map Designer<br/>
+* Sound designer<br/>
 **note**: List is not complete
 
 # Links
