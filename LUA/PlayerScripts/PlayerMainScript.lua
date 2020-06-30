@@ -1,4 +1,5 @@
 local Player ={}
+
 --for now it is advised to not have any variables that are important for work of the script as they will be reset due to issues with save system
 Player.DebugInt=0;
 
@@ -17,11 +18,11 @@ function Player:OnLoaded()
 end
 
 function Player:OnNum9Pressed()
+    self.GiveSelf(self.GetSelf())
     Player.SpawnDebugString();    
 end
 
 function Player:BeginPlay()
-    --Add here code
 end
 
 return Player;
