@@ -8,23 +8,24 @@ function Solder:Die()
 end
 
  function Solder:CalculateHitVelocity(HitFromDirection,HitInfo,DamageCauser)
-   ImpulseModifier=0.07;--default is 0.07. Increase it to create ragdoll chaos
+    --this code is currently not used because of vector issue(result is always in one direction for grenades)
+    ImpulseModifier=0.7;--default is 0.07. Increase it to create ragdoll chaos
     Impulse=nil;
     if(DamageCauser~=nil)
     then
         if(IsBullet(DamageCauser)==true)
         then
-        Impulse= Vector:new(Actor:GetVelocity(DamageCauser)["X"]* ImpulseModifier,Actor:GetVelocity(DamageCauser)["Y"]* ImpulseModifier,Actor:GetVelocity(DamageCauser)["Z"]* ImpulseModifier)
+        Impulse= Vector:MultiplyByFloat(Actor:GetVelocity(DamageCauser),ImpulseModifier)
         elseif(IsGrenade(DamageCauser)==true)     
         then
             Rotation= Rotator:FindLookAtRotation(Actor:GetLocation(DamageCauser),HitInfo["Location"]);
-            Distance = Grenade:GetDamageRadius(DamageCauser)-HitInfo["Distance"];
-            Impulse = Vector:MultiplyByFloat(Rotator:GetRotationXVector(Rotation),Distance);
+            Distance = Grenade:GetDamageRadius(DamageCauser) - HitInfo["Distance"];
+            Impulse = Vector:MultiplyByFloat(Rotator:GetRotationXVector(Rotation),Distance*0.01);
         else
-            Impulse=HitInfo["TraceStart"]-HitInfo["TraceEnd"]
+            Impulse=Vector:Subtract(HitInfo["TraceStart"],HitInfo["TraceEnd"])
         end
     else
-        Impulse=HitInfo["TraceStart"]-HitInfo["TraceEnd"]
+        ImpulseVector:Subtract(HitInfo["TraceStart"],HitInfo["TraceEnd"])
     end
     Result={}
     Result["Impulse"]=Impulse

@@ -18,11 +18,10 @@ function Player:OnLoaded()
 end
 
 function Player:OnNum9Pressed()
-    self.GiveSelf(self.GetSelf())
-    Player.SpawnDebugString();    
+  Achivements:MakeAdvancement("lua_test_achivement",1)    
 end
 
-function Player:BeginPlay()
+function Player:BeginPlay()  
 end
 
 return Player;
