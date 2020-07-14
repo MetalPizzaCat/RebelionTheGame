@@ -17,8 +17,7 @@ enum class EAmmoType : uint8
 {
 	EAT_Rifle 	UMETA(DisplayName = "Rifle"),
 	EAT_Shotgun 	UMETA(DisplayName = "Shotgun"),
-	EAT_Pistol 	UMETA(DisplayName = "Pistol"),
-	EAT_Grenade 	UMETA(DisplayName = "Grenade"),
+	EAT_Pistol 	UMETA(DisplayName = "Pistol")
 };
 
 UENUM(BlueprintType)		//What ammo weapon needs
@@ -60,6 +59,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HandOffset)
 		FVector LeftHandOffset = FVector(0, 0, 0);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponFiring)
+		bool bUseMuzzleFlashOfTheMesh = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponFiring)
+		FString WeaponEffectsSocketName = "b_gun_muzzleflash";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponFiring)
+		bool bUpdateShootingPositionWhenAiming = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		FTimerHandle CooldownTimerHadle;
@@ -112,8 +120,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		USoundBase* ReloadSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated,Category=Scope)
+		bool bHasScope = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, SaveGame)
 		AActor* WeaponOwner;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Category, SaveGame)
+		int Category = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, SaveGame)
 		int AmmoInTheClip = 0;
