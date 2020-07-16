@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "Perception/AISightTargetInterface.h"
 #include "FootstepInterface.h"
+#include "Healthkit/HealthkitInfo.h"
 #include "PropHuntCharacter.generated.h"
 
 class UInputComponent;
@@ -83,8 +84,23 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Mesh)
 		class USkeletalMeshComponent* FP_Gun;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Health, SaveGame)
+		TArray<FHealthkitInfo> Healthkits;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, SaveGame)
+		bool bCanAutoUseHealthKits = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, SaveGame)
+		bool bPreferBiggerHealthkitsForAuto = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, SaveGame)
+		float MinHealthToAutoUse = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = Health, SaveGame)
 		float Health = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, SaveGame)
+		float MaxHealth = 100.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		bool bAllowedToSprint = false;
@@ -198,6 +214,8 @@ public:
 
 	void StartClimbingLadder_Implementation();
 
+	
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void StopClimbingLadder();
 
@@ -208,6 +226,53 @@ public:
 		void UpdateMeshPositionOnCrouch(bool isCrouching);
 
 	void UpdateMeshPositionOnCrouch_Implementation(bool isCrouching){}
+
+
+	/*
+	how to use health functions
+	1)To get healthier from pick-up-health
+	AddHealth from interface -> ApplyHealthKit
+	2)To use from inventory
+	UseHealthKitById
+	3)ForceToUseHealthKit is internal function but can be used for scriptied events(also overridable, so that different children of character could react differently
+	4)When damaged
+	ShouldAutoUseHealthKit ->(if needed) ApplyHealthKitFromInventory
+	*/
+
+	/*Can also be used to check if player is near death*/
+	UFUNCTION(BlueprintPure, Category = Health)
+		/*Can also be used to check if player is near death*/
+		bool ShouldAutoUseHealthKit();
+
+	/*Function used to auto apply health kits when low on health.
+	It works from lowest to highest(so when low on health it will apply the smallest one available) unless bPreferBiggerHealthkitsForAuto = true */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Health)
+		/*Function used to auto apply health kits when low on health.
+	It works from lowest to highest(so when low on health it will apply the smallest one available) unless bPreferBiggerHealthkitsForAuto = true */
+		void ApplyHealthKitFromInventory();
+
+	void  ApplyHealthKitFromInventory_Implementation();
+
+	/*Uses healthkit even if doesn't need to*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Health)
+		/*Uses healthkit even if doesn't need to*/
+		void ForceToUseHealthKit(FHealthkitInfo info);
+
+	void  ForceToUseHealthKit_Implementation(FHealthkitInfo info);
+
+	/*Uses healthkit even if doesn't need to*/
+	UFUNCTION(BlueprintCallable, Category = Health)
+		/*Uses healthkit even if doesn't need to*/
+		bool UseHealthKitById(int id);
+
+	/*Adds health or if doesn't need to, stores in the inventory. Returns true if used it, false if stored */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Health)
+		/*Adds health or if doesn't need to, stores in the inventory. Returns true if used it, false if stored */
+		bool ApplyHealthKit(FHealthkitInfo info);
+
+	bool  ApplyHealthKit_Implementation(FHealthkitInfo info);
+
+	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		bool CanSprint();

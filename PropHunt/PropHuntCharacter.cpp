@@ -66,7 +66,7 @@ APropHuntCharacter::APropHuntCharacter()
 #endif // !USEDEFAULTMESHSYSTEM
 
 	
-
+	
 	
 	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun 
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
@@ -357,10 +357,100 @@ void APropHuntCharacter::StartClimbingLadder_Implementation()
 	Cast<UCharacterMovementComponent>(GetMovementComponent())->SetMovementMode(EMovementMode::MOVE_Flying);//set movement to Flying./*althought it looks weird, actual flying can be exucuted by checking if IsOnTheLAdder or something like that is false
 }
 
+bool APropHuntCharacter::ShouldAutoUseHealthKit()
+{
+	if (Health <= MinHealthToAutoUse && bCanAutoUseHealthKits)
+	{
+		return true;
+	}
+	return false;
+}
+
 void APropHuntCharacter::StopClimbingLadder_Implementation()
 {
 	bIsOnTheLadder = false;
 	Cast<UCharacterMovementComponent>(GetMovementComponent())->SetMovementMode(EMovementMode::MOVE_Walking);//set movement to walking
+}
+
+void APropHuntCharacter::ApplyHealthKitFromInventory_Implementation()
+{
+	if (Healthkits.Num() > 0)
+	{
+		if (bPreferBiggerHealthkitsForAuto)
+		{
+			int max = 0;
+			int id = -1;
+			for (int i = 0; i < Healthkits.Num(); i++)
+			{
+				if (Healthkits[i].Health > max)
+				{
+					id = i;
+					max = Healthkits[i].Health;
+				}
+			}
+			if (id != -1)
+			{
+				UseHealthKitById(id);
+				//use healthkit here
+			}
+			
+		}
+		else
+		{
+			int min = 0;
+			int id = -1;
+			for (int i = 0; i < Healthkits.Num(); i++)
+			{
+				if (Healthkits[i].Health < min || i == 0)
+				{
+					id = i;
+					min = Healthkits[i].Health;
+				}
+			}
+			if (id != -1)
+			{
+				UseHealthKitById(id);
+				//use healthkit here
+			}
+		}
+	}
+}
+
+void APropHuntCharacter::ForceToUseHealthKit_Implementation(FHealthkitInfo info)
+{
+	Health += info.Health;
+	if (info.HealSound != nullptr)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), info.HealSound);
+	}
+	if (Health > MaxHealth) { Health = MaxHealth; }
+}
+
+bool APropHuntCharacter::UseHealthKitById(int id)
+{
+	if (Healthkits.Num() > 0)
+	{
+		if (Healthkits.IsValidIndex(id))
+		{
+			ForceToUseHealthKit(Healthkits[id]);
+			Healthkits.RemoveAt(id);
+		}
+	}
+	return false;
+}
+
+bool APropHuntCharacter::ApplyHealthKit_Implementation(FHealthkitInfo info)
+{
+	if (ShouldAutoUseHealthKit())
+	{
+		ForceToUseHealthKit(info);
+		return true;
+	}
+	else
+	{
+		Healthkits.Add(info);
+		return false;
+	}
 }
 
 bool APropHuntCharacter::CanSprint_Implementation()
