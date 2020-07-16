@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Healthkit/HealthkitInfo.h"
 #include "InteractionInterface.generated.h"
 
 // This class does not need to be modified.
@@ -27,7 +28,7 @@ public:
 		void Interact(AActor* interactor, UPrimitiveComponent* interactedComponent);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		bool AddHealth(float amountOfHealth);
+		bool AddHealth(FHealthkitInfo info);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Keys)
 		bool HasKeyWithId(int id);
